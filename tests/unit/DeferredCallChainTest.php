@@ -75,6 +75,22 @@ class DeferredCallChainTest extends \AbstractTest
         );
     }
 
+    /**
+     * @see https://stackoverflow.com/questions/5525795/does-javascript-guarantee-object-property-order
+     */
+    public function test_jsonSerialize()
+    {
+        $nameRobert = LaterHuman::new_()
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ;
+
+        $this->assertEquals(
+            '{"setName":["Muda"],"setFirstName":["Robert"]}',
+            json_encode($nameRobert)
+        );
+    }
+
     /**/
 }
 
