@@ -27,5 +27,10 @@ $nameRobert = (new DeferredCallChain)
 $mySubjectIMissedBefore = new Human;
 $robert = $nameRobert( $mySubjectIMissedBefore );
 
-echo $robert->getFullName(); // => Robert Muda
+echo $robert->getFullName(); // => "Robert Muda"
+echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setName('Muda')->setFirstName('Robert')"
 ```
+
+## More
++ [Docs](docs)
++ [Tests](tests/unit/DeferredCallChainTest.php)
