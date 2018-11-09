@@ -9,8 +9,9 @@ namespace JClaveau\Async;
 
 /**
  */
-class DeferredCallChain implements \JsonSerializable
+class DeferredCallChain implements \JsonSerializable, \ArrayAccess
 {
+    /** @var */
     protected $stack = [];
 
     /**
@@ -21,6 +22,18 @@ class DeferredCallChain implements \JsonSerializable
     }
 
     /**
+     * ArrayAccess interface
+     */
+    public function &offsetGet($key)
+    {
+        $this->stack[] = [
+            'entry' => $key,
+        ];
+
+        return $this;
+    }
+
+    /**
      * @param  string $method
      * @param  array  $arguments
      *
@@ -28,7 +41,10 @@ class DeferredCallChain implements \JsonSerializable
      */
     public final function __call($method, array $arguments)
     {
-        $this->stack[ $method ] = $arguments;
+        $this->stack[] = [
+            'method'    => $method,
+            'arguments' => $arguments,
+        ];
 
         return $this;
     }
@@ -49,13 +65,18 @@ class DeferredCallChain implements \JsonSerializable
     {
         $string = '(new ' . get_called_class() . ')';
 
-        foreach ($this->stack as $method => $arguments) {
-            $string .= '->';
-            $string .= $method.'(';
-            $string .= implode(', ', array_map(function($argument) {
-                return var_export($argument, true);
-            }, $arguments));
-            $string .= ')';
+        foreach ($this->stack as $i => $call) {
+            if (isset($call['method'])) {
+                $string .= '->';
+                $string .= $call['method'].'(';
+                $string .= implode(', ', array_map(function($argument) {
+                    return var_export($argument, true);
+                }, $call['arguments']));
+                $string .= ')';
+            }
+            else {
+                $string .= '[' . var_export($call['entry'], true) . ']';
+            }
         }
 
         return $string;
@@ -67,9 +88,14 @@ class DeferredCallChain implements \JsonSerializable
     public function __invoke($target)
     {
         $out = $target;
-        foreach ($this->stack as $method => $arguments) {
+        foreach ($this->stack as $i => $call) {
             try {
-                $out = call_user_func_array([$out, $method], $arguments);
+                if (isset($call['method'])) {
+                    $out = call_user_func_array([$out, $call['method']], $call['arguments']);
+                }
+                else {
+                    $out = $out[ $call['entry'] ];
+                }
             }
             catch (\Exception $e) {
                 // Throw $e with the good stack (usage exception)
@@ -78,6 +104,36 @@ class DeferredCallChain implements \JsonSerializable
         }
 
         return $out;
+    }
+
+    /**
+     * ArrayAccess interface
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new BadMethodCallException(
+            "not implemented"
+        );
+    }
+
+    /**
+     * ArrayAccess interface
+     */
+    public function offsetExists($offset)
+    {
+        throw new BadMethodCallException(
+            "not implemented"
+        );
+    }
+
+    /**
+     * ArrayAccess interface
+     */
+    public function offsetUnset($offset)
+    {
+        throw new BadMethodCallException(
+            "not implemented"
+        );
     }
 
     /**/
