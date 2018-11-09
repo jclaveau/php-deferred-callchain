@@ -62,15 +62,56 @@ class DeferredCallChainTest extends \AbstractTest
 
     /**
      */
+    public function test_invoke_entry()
+    {
+        $getName = (new DeferredCallChain)
+            ['name']
+            ;
+
+        $robert = ['name' => 'Muda', 'firstname' => 'Robert'];
+
+        $name = $getName( $robert );
+
+        $this->assertEquals(
+            "Muda",
+            $name
+        );
+    }
+
+    /**
+     */
+    public function test_call_missing_entry()
+    {
+        $getName = (new DeferredCallChain)
+            ['non_existing_entry']
+            ;
+
+        $robert = ['name' => 'Muda', 'firstname' => 'Robert'];
+
+        try {
+            $name = $getName( $robert );
+            $this->assertTrue(false, 'An exception should have been thrown here');
+        }
+        catch (\Exception $e) {
+            $this->assertEquals(
+                 "Undefined index: non_existing_entry",
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
     public function test_toString_extended()
     {
         $nameRobert = LaterHuman::new_()
             ->setName('Muda')
+            ['entry']
             ->setFirstName('Robert')
             ;
 
         $this->assertEquals(
-            "(new JClaveau\Async\LaterHuman)->setName('Muda')->setFirstName('Robert')",
+            "(new JClaveau\Async\LaterHuman)->setName('Muda')['entry']->setFirstName('Robert')",
             (string) $nameRobert
         );
     }
@@ -83,10 +124,11 @@ class DeferredCallChainTest extends \AbstractTest
         $nameRobert = LaterHuman::new_()
             ->setName('Muda')
             ->setFirstName('Robert')
+            ['entry']
             ;
 
         $this->assertEquals(
-            '{"setName":["Muda"],"setFirstName":["Robert"]}',
+            '[{"method":"setName","arguments":["Muda"]},{"method":"setFirstName","arguments":["Robert"]},{"entry":"entry"}]',
             json_encode($nameRobert)
         );
     }
