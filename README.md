@@ -19,6 +19,7 @@ php-deferred-callchain is installable via [Composer](http://getcomposer.org)
 
 ## Usage
 ```php
+// fluent call chain
 $nameRobert = (new DeferredCallChain)
     ->setName('Muda')
     ->setFirstName('Robert')
@@ -29,6 +30,28 @@ $robert = $nameRobert( $mySubjectIMissedBefore );
 
 echo $robert->getFullName(); // => "Robert Muda"
 echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setName('Muda')->setFirstName('Robert')"
+
+// working with arrays
+$getSubColumnValue = (new DeferredCallChain)
+    ['column_1']
+    ['sub_column_3']
+    ;
+
+$sub_column_3_value = $getSubColumnValue( [
+    'column_1' => [
+        'sub_column_1' => 'lalala',
+        'sub_column_2' => 'lololo',
+        'sub_column_3' => 'lilili',
+    ],
+    'column_2' => [
+        'sub_column_1' => 'lululu',
+        'sub_column_2' => 'lelele',
+        'sub_column_3' => 'lylyly',
+    ],
+] );
+
+echo $sub_column_3_value;           // => "lilili"
+echo (string) $getSubColumnValue;   // => "(new JClaveau\Async\DeferredCallChain)['column_1']['sub_column_3']"
 ```
 
 ## More
