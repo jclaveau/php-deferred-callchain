@@ -111,7 +111,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        throw new BadMethodCallException(
+        throw new \BadMethodCallException(
             "not implemented"
         );
     }
@@ -121,7 +121,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      */
     public function offsetExists($offset)
     {
-        throw new BadMethodCallException(
+        throw new \BadMethodCallException(
             "not implemented"
         );
     }
@@ -129,7 +129,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     /**
      * ArrayAccess interface
      */
-    public function offsetUnset($offset)
+    public function \offsetUnset($offset)
     {
         throw new BadMethodCallException(
             "not implemented"
