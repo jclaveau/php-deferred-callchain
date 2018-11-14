@@ -6,15 +6,21 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\Async;
+use       BadMethodCallException;
 
 /**
+ * This class stores an arbitrary stack of calls (methods or array entries access)
+ * that will be callable on any future variable.
  */
 class DeferredCallChain implements \JsonSerializable, \ArrayAccess
 {
-    /** @var */
+    /** @var array $stack The stack of deferred calls */
     protected $stack = [];
 
     /**
+     * Simple factory to avoid (new DeferredCallChain)
+     *
+     * @return $this
      */
     public static function new_()
     {
@@ -23,6 +29,8 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
 
     /**
      * ArrayAccess interface
+     *
+     * @param string $key The entry to acces
      */
     public function &offsetGet($key)
     {
@@ -34,6 +42,8 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     }
 
     /**
+     * Stores any call in the the stack.
+     *
      * @param  string $method
      * @param  array  $arguments
      *
@@ -60,6 +70,10 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     }
 
     /**
+     * Outputs the PHP code producing the current call chain while it's casted
+     * as a string.
+     *
+     * @return string The PHP code corresponding to this call chain
      */
     public function __toString()
     {
@@ -84,6 +98,9 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
 
     /**
      * Invoking the instance produces the call of the stack
+     *
+     * @param  $target The target to apply the callchain on
+     * @return The value returned once the call chain is called uppon $target
      */
     public function __invoke($target)
     {
@@ -107,31 +124,41 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     }
 
     /**
-     * ArrayAccess interface
+     * Unused part of the ArrayAccess interface
+     *
+     * @param  $offset
+     * @param  $value
+     * @throws \BadMethodCallException
      */
     public function offsetSet($offset, $value)
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             "not implemented"
         );
     }
 
     /**
-     * ArrayAccess interface
+     * Unused part of the ArrayAccess interface
+     *
+     * @param  $offset
+     * @throws \BadMethodCallException
      */
     public function offsetExists($offset)
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             "not implemented"
         );
     }
 
     /**
-     * ArrayAccess interface
+     * Unused part of the ArrayAccess interface
+     *
+     * @param  $offset
+     * @throws \BadMethodCallException
      */
     public function offsetUnset($offset)
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             "not implemented"
         );
     }

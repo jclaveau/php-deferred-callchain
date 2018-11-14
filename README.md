@@ -18,8 +18,8 @@ php-deferred-callchain is installable via [Composer](http://getcomposer.org)
     composer require jclaveau/php-deferred-callchain
 
 ## Usage
+### Fluent call chain
 ```php
-// fluent call chain
 $nameRobert = (new DeferredCallChain)
     ->setName('Muda')
     ->setFirstName('Robert')
@@ -30,8 +30,10 @@ $robert = $nameRobert( $mySubjectIMissedBefore );
 
 echo $robert->getFullName(); // => "Robert Muda"
 echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setName('Muda')->setFirstName('Robert')"
+```
 
-// working with arrays
+### Working with arrays
+```php
 $getSubColumnValue = (new DeferredCallChain)
     ['column_1']
     ['sub_column_3']
