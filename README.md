@@ -60,3 +60,6 @@ echo (string) $getSubColumnValue;   // => "(new JClaveau\Async\DeferredCallChain
 ## More
 + [Docs](docs)
 + [Tests](tests/unit/DeferredCallChainTest.php)
+
+## Related
++ https://github.com/danielsdeboer/pipe
