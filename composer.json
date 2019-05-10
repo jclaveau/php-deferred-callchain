@@ -22,11 +22,6 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/jclaveau/php-visibility-violator",
-            "no-api": true
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/jclaveau/xhprof",
             "no-api": true
         },
@@ -40,7 +35,7 @@
         "phpunit/phpunit": "5.*",
         "jclaveau/phpunit-testlistener-xhprof": "dev-master",
         "jclaveau/xhprof": "dev-master",
-        "jclaveau/php-visibility-violator": "dev-master",
+        "jclaveau/php-visibility-violator": "^1.0",
         "jclaveau/phpunit-profile-asserts": "^1.0"
     },
     "require": {
