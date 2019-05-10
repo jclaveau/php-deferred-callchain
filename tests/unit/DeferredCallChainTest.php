@@ -133,6 +133,57 @@ class DeferredCallChainTest extends \AbstractTest
         );
     }
 
+    /**
+     */
+    public function test_ArrayAccess_unimplemented_offsetExists()
+    {
+        try {
+            $nameRobert = LaterHuman::new_();
+            isset($nameRobert['property_that_could_not_be_tested']);
+            $this->assertTrue(false, "An exception must have been thrown here");
+        }
+        catch (\Exception $e) {
+            $this->assertEquals(
+                "not implemented",
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
+    public function test_ArrayAccess_unimplemented_offsetUnset()
+    {
+        try {
+            $nameRobert = LaterHuman::new_();
+            unset($nameRobert['property_that_could_not_be_unset']);
+            $this->assertTrue(false, "An exception must have been thrown here");
+        }
+        catch (\Exception $e) {
+            $this->assertEquals(
+                "not implemented",
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
+    public function test_ArrayAccess_unimplemented_offsetSet()
+    {
+        try {
+            $nameRobert = LaterHuman::new_();
+            $nameRobert['property_that_could_not_be_set'] = 'plop';
+            $this->assertTrue(false, "An exception must have been thrown here");
+        }
+        catch (\Exception $e) {
+            $this->assertEquals(
+                "not implemented",
+                $e->getMessage()
+            );
+        }
+    }
+
     /**/
 }
 
