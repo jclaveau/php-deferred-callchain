@@ -10,6 +10,7 @@ use       JClaveau\Async\Exceptions\BadTargetClassException;
 use       JClaveau\Async\Exceptions\BadTargetTypeException;
 use       JClaveau\Async\Exceptions\UndefinedTargetClassException;
 use       JClaveau\Async\Exceptions\BadTargetInterfaceException;
+use       JClaveau\Async\Exceptions\TargetAlreadyDefinedException;
 use       BadMethodCallException;
 
 /**

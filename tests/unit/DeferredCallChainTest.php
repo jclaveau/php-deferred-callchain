@@ -59,6 +59,28 @@ class DeferredCallChainTest extends \AbstractTest
 
     /**
      */
+    public function test_invoke_with_predefined_target_and_a_new_target()
+    {
+        $mySubject = new Human;
+        
+        $nameRobert = (new DeferredCallChain($mySubject))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+
+        try {
+            $fullName = $nameRobert(new Human);
+            $this->assertFalse(true, "an exception has not been thrown");
+        }
+        catch (\JClaveau\Async\Exceptions\TargetAlreadyDefinedException $e) {
+            $this->assertTrue(true, "exception thrown as expected");
+        }
+    }
+
+    /**
+     */
     public function test_invoke_with_target_class()
     {
         $nameRobert = (new DeferredCallChain( Human::class ))
