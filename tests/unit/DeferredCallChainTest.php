@@ -20,6 +20,38 @@ class DeferredCallChainTest extends \AbstractTest
 
     /**
      */
+    public function test_toString_with_string_target()
+    {
+        $nameRobert = DeferredCallChain::new_("Human")
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ;
+
+        $this->assertEquals(
+            "(new JClaveau\Async\DeferredCallChain('Human'))->setName('Muda')->setFirstName('Robert')",
+            (string) $nameRobert
+        );
+    }
+
+    /**
+     */
+    public function test_toString_with_instance_target()
+    {
+        $human = new Human;
+        
+        $nameRobert = DeferredCallChain::new_($human)
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ;
+
+        $this->assertEquals(
+            "(new JClaveau\Async\DeferredCallChain( JClaveau\Async\Human#" . spl_object_id($human) . " ))->setName('Muda')->setFirstName('Robert')",
+            (string) $nameRobert
+        );
+    }
+
+    /**
+     */
     public function test_invoke()
     {
         $nameRobert = (new DeferredCallChain)

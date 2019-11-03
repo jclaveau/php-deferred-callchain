@@ -89,7 +89,14 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      */
     public function __toString()
     {
-        $string = '(new ' . get_called_class() . ')';
+        $string = '(new ' . get_called_class();
+        if (is_string($this->expectedTarget)) {
+            $string .= '(' . var_export($this->expectedTarget, true) . ')';
+        }
+        elseif (is_object($this->expectedTarget)) {
+            $string .= '( ' . get_class($this->expectedTarget) . '#' . spl_object_id($this->expectedTarget) . ' )';
+        }
+        $string .= ')';
 
         foreach ($this->stack as $i => $call) {
             if (isset($call['method'])) {
