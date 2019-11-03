@@ -31,7 +31,7 @@ echo $robert->getFullName(); // => "Robert Muda"
 echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setName('Muda')->setFirstName('Robert')"
 ```
 
-### Allowing a specific class, type or a predefined instance as target of the later call.
+### Allowing a specific class, interface, type or a predefined instance as target of the later call.
 ```php
 $nameRobert = DeferredCallChain::new_("Alien")
     ->setName('Muda')
