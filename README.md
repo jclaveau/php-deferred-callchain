@@ -10,7 +10,6 @@ Quality
 [![codecov](https://codecov.io/gh/jclaveau/php-deferred-callchain/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-deferred-callchain)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/?branch=master)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-deferred-callchain/issues)
-[![Viewed](http://hits.dwyl.com/jclaveau/php-deferred-callchain.svg)](http://hits.dwyl.com/jclaveau/php-deferred-callchain)
 
 ## Installation
 php-deferred-callchain is installable via [Composer](http://getcomposer.org)
@@ -20,7 +19,7 @@ php-deferred-callchain is installable via [Composer](http://getcomposer.org)
 ## Usage
 ### Fluent call chain
 ```php
-$nameRobert = (new DeferredCallChain)
+$nameRobert = DeferredCallChain::new_()
     ->setName('Muda')
     ->setFirstName('Robert')
     ;
@@ -30,6 +29,48 @@ $robert = $nameRobert( $mySubjectIMissedBefore );
 
 echo $robert->getFullName(); // => "Robert Muda"
 echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setName('Muda')->setFirstName('Robert')"
+```
+
+### Allowing a specific class, type or a predefined instance as target of the later call.
+```php
+$nameRobert = DeferredCallChain::new_("Alien")
+    ->setName('Muda')
+    ->setFirstName('Robert')
+    ;
+
+$mySubjectIMissedBefore = new Human;
+$robert = $nameRobert( $mySubjectIMissedBefore );
+
+// throws BadTargetClassException
+
+$getCount = (new DeferredCallChain("\Traversable"))
+    ->count()
+    ;
+
+$myCountableIMissedBefore = new CountableClass; // class implementing Countable
+
+// throws BadTargetInterfaceException
+
+$nameRobert = DeferredCallChain::new_("array")
+    ->setName('Muda')
+    ->setFirstName('Robert')
+    ;
+
+$mySubjectIMissedBefore = new Human;
+$robert = $nameRobert( $mySubjectIMissedBefore );
+
+// throws BadTargetTypeException
+
+$myTarget = new Human;
+$nameRobert = DeferredCallChain::new_($myTarget)
+    ->setName('Muda')
+    ->setFirstName('Robert')
+    ;
+
+$robert = $nameRobert( new Human );
+
+// throws TargetAlreadyDefinedException
+
 ```
 
 ### Working with arrays

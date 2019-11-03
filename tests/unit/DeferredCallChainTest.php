@@ -39,6 +39,157 @@ class DeferredCallChainTest extends \AbstractTest
 
     /**
      */
+    public function test_invoke_with_predefined_target()
+    {
+        $mySubject = new Human;
+        
+        $nameRobert = (new DeferredCallChain($mySubject))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+        $fullName = $nameRobert();
+
+        $this->assertEquals(
+            "Robert Muda",
+            $fullName
+        );
+    }
+
+    /**
+     */
+    public function test_invoke_with_target_class()
+    {
+        $nameRobert = (new DeferredCallChain( Human::class ))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+        $mySubjectIMissedBefore = new Human;
+        $fullName = $nameRobert( $mySubjectIMissedBefore );
+
+        $this->assertEquals(
+            "Robert Muda",
+            $fullName
+        );
+    }
+
+    /**
+     */
+    public function test_invoke_with_target_class_without_namespace()
+    {
+        $nameRobert = (new DeferredCallChain("Human"))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+        $mySubjectIMissedBefore = new Human;
+
+        try {
+            $fullName = $nameRobert( $mySubjectIMissedBefore );
+            $this->assertFalse(true, "an exception has not been thrown");
+        }
+        catch (\JClaveau\Async\Exceptions\UndefinedTargetClassException $e) {
+            $this->assertTrue(true, "exception thrown as expected");
+        }
+    }
+
+    /**
+     */
+    public function test_invoke_with_wrong_target_class()
+    {
+        $nameRobert = (new DeferredCallChain('\stdClass'))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+        $mySubjectIMissedBefore = new Human;
+
+        try {
+            $fullName = $nameRobert( $mySubjectIMissedBefore );
+            $this->assertFalse(true, "an exception has not been thrown");
+        }
+        catch (\JClaveau\Async\Exceptions\BadTargetClassException $e) {
+            $this->assertTrue(true, "exception thrown as expected");
+        }
+    }
+
+    /**
+     */
+    public function test_invoke_with_target_type()
+    {
+        $nameRobert = (new DeferredCallChain("object"))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+        $mySubjectIMissedBefore = new Human;
+        $fullName = $nameRobert( $mySubjectIMissedBefore );
+
+        $this->assertEquals(
+            "Robert Muda",
+            $fullName
+        );
+    }
+
+    /**
+     */
+    public function test_invoke_with_wrong_target_type()
+    {
+        $nameRobert = (new DeferredCallChain("string"))
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ;
+
+        $mySubjectIMissedBefore = new Human;
+
+        try {
+            $fullName = $nameRobert( $mySubjectIMissedBefore );
+            $this->assertFalse(true, "an exception has not been thrown");
+        }
+        catch (\JClaveau\Async\Exceptions\BadTargetTypeException $e) {
+            $this->assertTrue(true, "exception thrown as expected");
+        }
+    }
+
+    /**
+     */
+    public function test_invoke_with_interface()
+    {
+        $getCount = (new DeferredCallChain("\Countable"))
+            ->count()
+            ;
+
+        $this->assertTrue( is_int($getCount(new CountableClass)) );
+    }
+
+    /**
+     */
+    public function test_invoke_with_missing_target_interface()
+    {
+        $getCount = (new DeferredCallChain("\Traversable"))
+            ->count()
+            ;
+
+        $myCountableIMissedBefore = new CountableClass;
+
+        try {
+            $count = $getCount( $myCountableIMissedBefore );
+            $this->assertFalse(true, "an exception has not been thrown");
+        }
+        catch (\JClaveau\Async\Exceptions\BadTargetInterfaceException $e) {
+            $this->assertTrue(true, "exception thrown as expected");
+        }
+    }
+
+    /**
+     */
     public function test_call_missing_method()
     {
         $defineAge = (new DeferredCallChain)
@@ -212,4 +363,12 @@ class Human
 
 class LaterHuman extends DeferredCallChain
 {
+}
+
+class CountableClass implements \Countable
+{
+    public function count()
+    {
+        return rand(0, 100);
+    }
 }
