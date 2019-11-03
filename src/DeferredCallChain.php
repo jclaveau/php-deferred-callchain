@@ -14,18 +14,10 @@ use       BadMethodCallException;
  */
 class DeferredCallChain implements \JsonSerializable, \ArrayAccess
 {
+    use Jclaveau\Traits\Fluent\New_;
+    
     /** @var array $stack The stack of deferred calls */
     protected $stack = [];
-
-    /**
-     * Simple factory to avoid (new DeferredCallChain)
-     *
-     * @return $this
-     */
-    public static function new_()
-    {
-        return new static;
-    }
 
     /**
      * ArrayAccess interface
