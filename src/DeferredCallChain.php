@@ -116,12 +116,13 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     }
 
     /**
-     * Invoking the instance produces the call of the stack
-     *
-     * @param  $target The target to apply the callchain on
-     * @return The value returned once the call chain is called uppon $target
+     * Checks that the provided target matches the type/class/interface
+     * given during construction.
+     * 
+     * @param  mixed $target
+     * @return mixed $target Checked
      */
-    public function __invoke($target=null)
+    protected function checkTarget($target)
     {
         if (is_object($this->expectedTarget)) {
             if ($target) {
@@ -155,6 +156,19 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
         else {
             $out = $target;
         }
+        
+        return $out;
+    }
+
+    /**
+     * Invoking the instance produces the call of the stack
+     *
+     * @param  $target The target to apply the callchain on
+     * @return The value returned once the call chain is called uppon $target
+     */
+    public function __invoke($target=null)
+    {
+        $out = $this->checkTarget($target);
         
         foreach ($this->stack as $i => $call) {
             try {
