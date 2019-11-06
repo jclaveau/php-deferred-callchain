@@ -247,7 +247,7 @@ class DeferredCallChainTest extends \AbstractTest
     public function test_call_missing_method()
     {
         $defineAge = (new DeferredCallChain)
-            ->setAge(23)
+            ->setColor("green") // fuck racism ;)
             ;
 
         $mySubjectIMissedBefore = new Human;
@@ -256,10 +256,67 @@ class DeferredCallChainTest extends \AbstractTest
             $fullName = $defineAge( $mySubjectIMissedBefore );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\Exception $e) {
+        catch (\BadMethodCallException $e) {
+            // throw $e;
+            // var_dump(get_class($e));
+            // var_dump(array_slice($e->getTrace(), 0, 5));
+            
             $this->assertEquals(
-                 "call_user_func_array() expects parameter 1 to be a valid callback, "
-                ."class 'JClaveau\Async\Human' does not have a method 'setAge'",
+                 "setColor() is neither a method of JClaveau\Async\Human nor a function",
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
+    public function test_call_of_magic_method__call()
+    {
+        $defineAge = (new DeferredCallChain)
+            ->setAge(23)
+            ;
+
+        $mySubjectIMissedBefore = new Human;
+        $fullName = $defineAge( $mySubjectIMissedBefore );
+        
+        $this->assertEquals(23, $mySubjectIMissedBefore->getAge());
+    }
+
+    /**
+     */
+    public function test_exception_trown_from__call_magic_method()
+    {
+        $defineAge = (new DeferredCallChain)
+            ->setGender('female')
+            ;
+
+        try {
+            $fullName = $defineAge( new Human );
+            $this->assertTrue(false, 'An exception should have been thrown here');
+        }
+        catch (\Exception $e) {            
+            $this->assertEquals(
+                 "Exception which is not a BadMethodCallException",
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
+    public function test_exception_trown_under__call_magic_method()
+    {
+        $defineAge = (new DeferredCallChain)
+            ->setGender2('female')
+            ;
+
+        try {
+            $fullName = $defineAge( new Human );
+            $this->assertTrue(false, 'An exception should have been thrown here');
+        }
+        catch (\BadMethodCallException $e) {            
+            $this->assertEquals(
+                 "BadMethodCallException not thrown from __call",
                 $e->getMessage()
             );
         }
@@ -389,6 +446,34 @@ class DeferredCallChainTest extends \AbstractTest
         }
     }
 
+    /**
+     */
+    public function test_function_call()
+    {
+        $nameRobertUppercase = LaterHuman::new_()
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ->strtoupper()
+            ;
+            
+        $this->assertEquals('ROBERT MUDA', $nameRobertUppercase(new Human));
+    }
+
+    /**
+     */
+    public function test_function_call_with_placeholder()
+    {
+        $nameRobertUppercase = LaterHuman::new_()
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->getFullName()
+            ->explode(' ', '$$')
+            ;
+            
+        $this->assertEquals(['Robert', 'Muda'], $nameRobertUppercase(new Human));
+    }
+
     /**/
 }
 
@@ -396,6 +481,7 @@ class Human
 {
     protected $name;
     protected $firstName;
+    protected $age;
 
     public function setName($name)
     {
@@ -412,6 +498,36 @@ class Human
     public function getFullName()
     {
         return $this->firstName . ' ' . $this->name;
+    }
+
+    public function getAge()
+    {
+        return $this->age;
+    }
+
+    protected function throwExceptionForTestPurpose()
+    {
+        throw new \BadMethodCallException("BadMethodCallException not thrown from __call");
+    }
+
+    public function __call($name, array $arguments)
+    {
+        if ($name == 'setAge') {
+            $this->age = $arguments[0];
+        }
+        elseif ($name == 'setGender') {
+            throw new \Exception("Exception which is not a BadMethodCallException");
+        }
+        elseif ($name == 'setGender2') {
+            $this->throwExceptionForTestPurpose();
+        }
+        else {
+            throw new \BadMethodCallException(
+                $name . ' is not a method of ' . Human::class
+            );
+        }
+        
+        return $this;
     }
 }
 

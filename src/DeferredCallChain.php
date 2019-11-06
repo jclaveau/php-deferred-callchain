@@ -20,6 +20,7 @@ use       BadMethodCallException;
 class DeferredCallChain implements \JsonSerializable, \ArrayAccess
 {
     use \JClaveau\Traits\Fluent\New_;
+    use FunctionCallTrait;
     
     /** @var array $stack The stack of deferred calls */
     protected $stack = [];
@@ -161,19 +162,102 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     }
 
     /**
+     * Calling a method coded inside a magic __call can produce a 
+     * BadMethodCallException and thus not be a callable.
+     * 
+     * @param mixed  $current_chained_subject
+     * @param string $method_name
+     * @param array  $arguments
+     * 
+     * @return bool $is_called
+     */
+    protected function checkMethodIsReallyCallable(
+        &$current_chained_subject, 
+        $method_name,
+        $arguments
+    ) {
+        $is_called = true;
+        try {
+            $current_chained_subject = call_user_func_array(
+                [$current_chained_subject, $method_name], 
+                $arguments
+            );
+        }
+        catch (\BadMethodCallException $e) {
+            if ($this->exceptionTrownFromMagicCall(
+                $e->getTrace(),
+                $current_chained_subject,
+                $method_name
+            )) {
+                $is_called = false;
+            }
+            else {
+                throw $e;
+            }
+        }
+        
+        return $is_called;
+    }
+
+    /**
+     * Checks if the exception having $trace is thrown from à __call
+     * magic method.
+     * 
+     * @return bool $is_called
+     */
+    protected function exceptionTrownFromMagicCall(
+        $trace, 
+        $current_chained_subject,
+        $method_name
+    ) {
+        // Before PHP 7, there is a raw for the non existing method called
+        $call_user_func_array_position = PHP_VERSION_ID < 70000 ? 2 : 1;
+        
+        return  
+                $trace[0]['function'] == '__call'
+            &&  $trace[0]['class']    == get_class($current_chained_subject)
+            &&  $trace[0]['args'][0]  == $method_name
+            && (
+                    $trace[$call_user_func_array_position]['file'] == __FILE__
+                &&  $trace[$call_user_func_array_position]['function'] == 'call_user_func_array'
+            )
+            ;
+    }
+
+    /**
      * Invoking the instance produces the call of the stack
      *
-     * @param  $target The target to apply the callchain on
-     * @return The value returned once the call chain is called uppon $target
+     * @param  mixed $target The target to apply the callchain on
+     * @return mixde The value returned once the call chain is called uppon $target
      */
     public function __invoke($target=null)
     {
         $out = $this->checkTarget($target);
         
         foreach ($this->stack as $i => $call) {
+            $is_called = false;
             try {
                 if (isset($call['method'])) {
-                    $out = call_user_func_array([$out, $call['method']], $call['arguments']);
+                    if (is_callable([$out, $call['method']])) {
+                        $is_called = $this->checkMethodIsReallyCallable(
+                            $out,
+                            $call['method'],
+                            $call['arguments']
+                        );
+                    }
+                    
+                    if (! $is_called && is_callable($call['method'])) {
+                        $arguments = $this->prepareArgs($call['arguments'], $out);
+                        $out = call_user_func_array($call['method'], $arguments);
+                        $is_called = true;
+                    }
+                    
+                    if (! $is_called) {
+                        throw new \BadMethodCallException(
+                            $call['method'] . "() is neither a method of " . get_class($out)
+                            . " nor a function"
+                        );
+                    }
                 }
                 else {
                     $out = $out[ $call['entry'] ];
