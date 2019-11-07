@@ -31,12 +31,12 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     /**
      * Constructor 
      * 
-     * @param string $key The entry to acces
+     * @param string $class_type_interface_or_instance The expected target class/type/interface/instance
      */
-    public function __construct($class_type_or_instance=null)
+    public function __construct($class_type_interface_or_instance=null)
     {
-        if ($class_type_or_instance) {
-            $this->expectedTarget = $class_type_or_instance;
+        if ($class_type_interface_or_instance) {
+            $this->expectedTarget = $class_type_interface_or_instance;
         }
     }
 
@@ -203,7 +203,12 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      * Checks if the exception having $trace is thrown from à __call
      * magic method.
      * 
-     * @return bool $is_called
+     * @param  array  $trace
+     * @param  object $current_chained_subject
+     * @param  string $method_name
+     * 
+     * @return bool Whether or not the exception having the $trace has been
+     *              thrown from a __call() method.
      */
     protected function exceptionTrownFromMagicCall(
         $trace, 
@@ -228,7 +233,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      * Invoking the instance produces the call of the stack
      *
      * @param  mixed $target The target to apply the callchain on
-     * @return mixde The value returned once the call chain is called uppon $target
+     * @return mixed The value returned once the call chain is called uppon $target
      */
     public function __invoke($target=null)
     {

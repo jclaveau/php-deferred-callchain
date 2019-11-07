@@ -14,6 +14,9 @@ namespace JClaveau\Async;
  */
 trait FunctionCallTrait
 {
+    /**
+     * @var string $placeholder The value that will be replaced by the chain subject
+     */
     protected $placeholder = '$$';
     
     /**
@@ -42,6 +45,7 @@ trait FunctionCallTrait
     /**
      * Add the value as the first argument in the arguments list.
      * @param array $args
+     * @param mixed $value
      * @return array
      */
     protected function addValueAsFirstArg (array $args, $value)

@@ -72,7 +72,7 @@ class MyClass
     }
 }
 
-$upperifyMyClassString = DeferredCallChain( MyClass:class )
+$upperifyMyClassString = DeferredCallChain( MyClass::class )
     ->getString()
     ->strtoupper();
 
@@ -92,7 +92,7 @@ class MyClass
     }
 }
 
-$explodeMyClassSentence = DeferredCallChain( MyClass:class )
+$explodeMyClassSentence = DeferredCallChain( MyClass::class )
     ->getSentence()
     ->explode(' ', '$$');
 

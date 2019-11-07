@@ -2,8 +2,14 @@
 
 ## Table of Contents
 
+* [BadTargetClassException](#badtargetclassexception)
+    * [__construct](#__construct)
+* [BadTargetInterfaceException](#badtargetinterfaceexception)
+    * [__construct](#__construct-1)
+* [BadTargetTypeException](#badtargettypeexception)
+    * [__construct](#__construct-2)
 * [DeferredCallChain](#deferredcallchain)
-    * [new_](#new_)
+    * [__construct](#__construct-3)
     * [offsetGet](#offsetget)
     * [__call](#__call)
     * [jsonSerialize](#jsonserialize)
@@ -12,6 +18,115 @@
     * [offsetSet](#offsetset)
     * [offsetExists](#offsetexists)
     * [offsetUnset](#offsetunset)
+* [TargetAlreadyDefinedException](#targetalreadydefinedexception)
+    * [__construct](#__construct-4)
+* [UndefinedTargetClassException](#undefinedtargetclassexception)
+    * [__construct](#__construct-5)
+
+## BadTargetClassException
+
+Thrown when applying a deferred call chain on a target which is not
+an instance of the expected class.
+
+
+
+* Full name: \JClaveau\Async\Exceptions\BadTargetClassException
+* Parent class: 
+
+
+### __construct
+
+Constructor.
+
+```php
+BadTargetClassException::__construct( \JClaveau\Async\DeferredCallChain $callchain, mixed $expected_target, mixed $target )
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$callchain` | **\JClaveau\Async\DeferredCallChain** |  |
+| `$expected_target` | **mixed** | The expected class |
+| `$target` | **mixed** |  |
+
+
+
+
+---
+
+## BadTargetInterfaceException
+
+Thrown when applying a deferred call chain on a target which doesn't
+implement the expected interface.
+
+
+
+* Full name: \JClaveau\Async\Exceptions\BadTargetInterfaceException
+* Parent class: 
+
+
+### __construct
+
+Constructor.
+
+```php
+BadTargetInterfaceException::__construct( \JClaveau\Async\DeferredCallChain $callchain, mixed $expected_target, mixed $target )
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$callchain` | **\JClaveau\Async\DeferredCallChain** |  |
+| `$expected_target` | **mixed** | The expected interface |
+| `$target` | **mixed** |  |
+
+
+
+
+---
+
+## BadTargetTypeException
+
+Thrown when applying a deferred call chain on a target which is not
+of the expected type.
+
+
+
+* Full name: \JClaveau\Async\Exceptions\BadTargetTypeException
+* Parent class: 
+
+
+### __construct
+
+Constructor.
+
+```php
+BadTargetTypeException::__construct( \JClaveau\Async\DeferredCallChain $callchain, mixed $expected_target, mixed $target )
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$callchain` | **\JClaveau\Async\DeferredCallChain** |  |
+| `$expected_target` | **mixed** | The expected type |
+| `$target` | **mixed** |  |
+
+
+
+
+---
 
 ## DeferredCallChain
 
@@ -24,17 +139,23 @@ that will be callable on any future variable.
 * This class implements: \JsonSerializable, \ArrayAccess
 
 
-### new_
+### __construct
 
-Simple factory to avoid (new DeferredCallChain)
+Constructor
 
 ```php
-DeferredCallChain::new_(  ): $this
+DeferredCallChain::__construct( string $class_type_interface_or_instance = null )
 ```
 
 
 
-* This method is **static**.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$class_type_interface_or_instance` | **string** | The expected target class/type/interface/instance |
+
 
 
 
@@ -130,7 +251,7 @@ The PHP code corresponding to this call chain
 Invoking the instance produces the call of the stack
 
 ```php
-DeferredCallChain::__invoke(  $target ): \JClaveau\Async\The
+DeferredCallChain::__invoke( mixed $target = null ): mixed
 ```
 
 
@@ -140,12 +261,12 @@ DeferredCallChain::__invoke(  $target ): \JClaveau\Async\The
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$target` | **** | The target to apply the callchain on |
+| `$target` | **mixed** | The target to apply the callchain on |
 
 
 **Return Value:**
 
-value returned once the call chain is called uppon $target
+The value returned once the call chain is called uppon $target
 
 
 
@@ -218,7 +339,76 @@ DeferredCallChain::offsetUnset(  $offset )
 
 ---
 
+## TargetAlreadyDefinedException
+
+Thrown when applying a deferred call chain on a target which is already
+defined.
+
+
+
+* Full name: \JClaveau\Async\Exceptions\TargetAlreadyDefinedException
+* Parent class: 
+
+
+### __construct
+
+Constructor.
+
+```php
+TargetAlreadyDefinedException::__construct( \JClaveau\Async\DeferredCallChain $callchain, mixed $expected_target, mixed $target )
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$callchain` | **\JClaveau\Async\DeferredCallChain** |  |
+| `$expected_target` | **mixed** | The target instance |
+| `$target` | **mixed** |  |
+
+
+
+
+---
+
+## UndefinedTargetClassException
+
+Thrown when defining an expected target which is not an existing class,
+an existing interface or native type.
+
+
+
+* Full name: \JClaveau\Async\Exceptions\UndefinedTargetClassException
+* Parent class: 
+
+
+### __construct
+
+Constructor.
+
+```php
+UndefinedTargetClassException::__construct( \JClaveau\Async\DeferredCallChain $callchain, mixed $expected_target )
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$callchain` | **\JClaveau\Async\DeferredCallChain** |  |
+| `$expected_target` | **mixed** | The wrong expected target |
+
+
+
+
+---
+
 
 
 --------
-> This document was automatically generated from source code comments on 2018-11-14 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)
+> This document was automatically generated from source code comments on 2019-11-07 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)
