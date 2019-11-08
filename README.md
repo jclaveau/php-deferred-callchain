@@ -9,7 +9,7 @@ It can now also handle function calls on non-objects and access array entries.
 [![Total Downloads](https://poser.pugx.org/jclaveau/php-deferred-callchain/downloads)](https://packagist.org/packages/jclaveau/php-deferred-callchain)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-deferred-callchain/issues)
 
-Quality
+## Quality
 --------------
 [![Build Status](https://travis-ci.org/jclaveau/php-deferred-callchain.png?branch=master)](https://travis-ci.org/jclaveau/php-deferred-callchain)
 [![codecov](https://codecov.io/gh/jclaveau/php-deferred-callchain/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-deferred-callchain)
@@ -20,7 +20,9 @@ php-deferred-callchain is installable via [Composer](http://getcomposer.org)
 
     composer require jclaveau/php-deferred-callchain
 
+
 ## Usage
+
 ### Fluent call chain
 ```php
 $nameRobert = DeferredCallChain::new_()
@@ -34,6 +36,28 @@ $robert = $nameRobert( $mySubjectIMissedBefore );
 echo $robert->getFullName(); // => "Robert Muda"
 echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setName('Muda')->setFirstName('Robert')"
 ```
+
+
+### Functionnal and chained construction
+
+DeferredCallChain can be instanciated classically
+```php
+$nameRobert = (new DeferredCallChain(Human::class))
+    ->setName('Muda')->setFirstName('Robert');
+```
+
+Statically
+```php
+$nameRobert = DeferredCallChain::new_(Human::class)
+    ->setName('Muda')->setFirstName('Robert');
+```
+
+Or functionnaly
+```php
+$nameRobert = later(Human::class)
+    ->setName('Muda')->setFirstName('Robert');
+```
+
 
 ### Working with arrays
 ```php
@@ -58,6 +82,7 @@ $sub_column_3_value = $getSubColumnValue( [
 echo $sub_column_3_value;           // => "lilili"
 echo (string) $getSubColumnValue;   // => "(new JClaveau\Async\DeferredCallChain)['column_1']['sub_column_3']"
 ```
+
 
 ### Working with native types and functions
 The features above make calls to objects methods easy and async but when
@@ -103,6 +128,7 @@ $explodeMyClassSentence = DeferredCallChain::new_( MyClass::class )
 $explodeMyClassSentence( new MyClass ); // returns ['such', 'a', 'funny', 'lib', 'to', 'implement']
 
 ```
+
 
 ### Allowing a specific class, interface, type or a predefined instance as target of the later call.
 You can force the target of your call chain to:
@@ -163,6 +189,7 @@ $robert = $nameRobert( new Human );
 // throws TargetAlreadyDefinedException
 
 ```
+
 
 ## More
 + [API Reference](docs)

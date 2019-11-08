@@ -5,6 +5,21 @@ class DeferredCallChainTest extends \AbstractTest
 {
     /**
      */
+    public function test_later()
+    {
+        $nameRobert = later(Human::class)
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ;
+
+        $this->assertEquals(
+            "(new JClaveau\Async\DeferredCallChain(".var_export(Human::class, true)."))->setName('Muda')->setFirstName('Robert')",
+            (string) $nameRobert
+        );
+    }
+
+    /**
+     */
     public function test_toString()
     {
         $nameRobert = (new DeferredCallChain)
@@ -22,14 +37,21 @@ class DeferredCallChainTest extends \AbstractTest
      */
     public function test_toString_with_string_target()
     {
-        $nameRobert = DeferredCallChain::new_("Human")
+        $nameRobert = DeferredCallChain::new_(Human::class)
             ->setName('Muda')
             ->setFirstName('Robert')
             ;
 
         $this->assertEquals(
-            "(new JClaveau\Async\DeferredCallChain('Human'))->setName('Muda')->setFirstName('Robert')",
+            "(new JClaveau\Async\DeferredCallChain(".var_export(Human::class, true)."))->setName('Muda')->setFirstName('Robert')",
             (string) $nameRobert
+        );
+        
+        // Check that the toString result is valid PHP code
+        eval('$nameRobert2 = ' . $nameRobert . ';');
+        $this->assertEquals(
+            "(new JClaveau\Async\DeferredCallChain(".var_export(Human::class, true)."))->setName('Muda')->setFirstName('Robert')",
+            (string) $nameRobert2
         );
     }
 
