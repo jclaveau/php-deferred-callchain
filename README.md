@@ -2,14 +2,18 @@
 This class simply provides a way to define fluent chain of method calls before having
 the instance you wan't to applty it to.
 Once the expected instance is available, simply call the chain on it.
+It can now also handle function calls on non-objects and access array entries.
 
+[![Latest Stable Version](https://poser.pugx.org/jclaveau/php-deferred-callchain/v/stable)](https://packagist.org/packages/jclaveau/php-deferred-callchain)
+[![License](https://poser.pugx.org/jclaveau/php-deferred-callchain/license)](https://packagist.org/packages/jclaveau/php-deferred-callchain)
+[![Total Downloads](https://poser.pugx.org/jclaveau/php-deferred-callchain/downloads)](https://packagist.org/packages/jclaveau/php-deferred-callchain)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-deferred-callchain/issues)
 
 Quality
 --------------
 [![Build Status](https://travis-ci.org/jclaveau/php-deferred-callchain.png?branch=master)](https://travis-ci.org/jclaveau/php-deferred-callchain)
 [![codecov](https://codecov.io/gh/jclaveau/php-deferred-callchain/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-deferred-callchain)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/?branch=master)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-deferred-callchain/issues)
 
 ## Installation
 php-deferred-callchain is installable via [Composer](http://getcomposer.org)
@@ -72,7 +76,7 @@ class MyClass
     }
 }
 
-$upperifyMyClassString = DeferredCallChain( MyClass::class )
+$upperifyMyClassString = DeferredCallChain::new_( MyClass::class )
     ->getString()
     ->strtoupper();
 
@@ -92,7 +96,7 @@ class MyClass
     }
 }
 
-$explodeMyClassSentence = DeferredCallChain( MyClass::class )
+$explodeMyClassSentence = DeferredCallChain::new_( MyClass::class )
     ->getSentence()
     ->explode(' ', '$$');
 
@@ -161,5 +165,5 @@ $robert = $nameRobert( new Human );
 ```
 
 ## More
-+ [Docs](docs)
++ [API Reference](docs)
 + [Tests](tests/unit/DeferredCallChainTest.php)
