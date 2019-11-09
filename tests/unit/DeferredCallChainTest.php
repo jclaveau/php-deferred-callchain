@@ -67,7 +67,7 @@ class DeferredCallChainTest extends \AbstractTest
             ;
 
         $this->assertEquals(
-            "(new JClaveau\Async\DeferredCallChain( JClaveau\Async\Human#" . spl_object_id($human) . " ))->setName('Muda')->setFirstName('Robert')",
+            "(new JClaveau\Async\DeferredCallChain( JClaveau\Async\Human #" . spl_object_id($human) . " ))->setName('Muda')->setFirstName('Robert')",
             (string) $nameRobert
         );
     }
@@ -278,13 +278,11 @@ class DeferredCallChainTest extends \AbstractTest
             $fullName = $defineAge( $mySubjectIMissedBefore );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\BadMethodCallException $e) {
-            // throw $e;
-            // var_dump(get_class($e));
-            // var_dump(array_slice($e->getTrace(), 0, 5));
-            
+        catch (\BadMethodCallException $e) {            
             $this->assertEquals(
-                 "setColor() is neither a method of JClaveau\Async\Human nor a function",
+                 "setColor() is neither a method of JClaveau\Async\Human nor a function"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($mySubjectIMissedBefore). ' ))->setColor(\'green\')'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -312,13 +310,17 @@ class DeferredCallChainTest extends \AbstractTest
             ->setGender('female')
             ;
 
+        $somebody = new Human;
         try {
-            $fullName = $defineAge( new Human );
+            $fullName = $defineAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
         catch (\Exception $e) {            
             $this->assertEquals(
-                 "Exception which is not a BadMethodCallException",
+                 "Exception which is not a BadMethodCallException"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
+                 .'->setGender(\'female\')'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -333,12 +335,16 @@ class DeferredCallChainTest extends \AbstractTest
             ;
 
         try {
-            $fullName = $defineAge( new Human );
+            $somebody = new Human;
+            $fullName = $defineAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
         catch (\BadMethodCallException $e) {            
             $this->assertEquals(
-                 "BadMethodCallException not thrown from __call",
+                 "BadMethodCallException not thrown from __call"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
+                 .'->setGender2(\'female\')'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -378,7 +384,10 @@ class DeferredCallChainTest extends \AbstractTest
         }
         catch (\Exception $e) {
             $this->assertEquals(
-                 "Undefined index: non_existing_entry",
+                 "Undefined index: non_existing_entry"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export($robert, true). '))'
+                 .'[\'non_existing_entry\']'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 14),
                 $e->getMessage()
             );
         }
@@ -412,7 +421,9 @@ class DeferredCallChainTest extends \AbstractTest
             ;
 
         $this->assertEquals(
-            '[{"method":"setName","arguments":["Muda"]},{"method":"setFirstName","arguments":["Robert"]},{"entry":"entry"}]',
+            '[{"method":"setName","arguments":["Muda"],"file":' . json_encode(__FILE__) . ',"line":' . (__LINE__ - 6) . '},'
+            .'{"method":"setFirstName","arguments":["Robert"],"file":' . json_encode(__FILE__) . ',"line":' . (__LINE__ - 6) . '},'
+            .'{"entry":"entry","file":' . json_encode(__FILE__) . ',"line":' . (__LINE__ - 6) . '}]',
             json_encode($nameRobert)
         );
     }
@@ -496,6 +507,33 @@ class DeferredCallChainTest extends \AbstractTest
         $this->assertEquals(['Robert', 'Muda'], $nameRobertUppercase(new Human));
     }
 
+    /**
+     */
+    public function test_usage_exception()
+    {
+        $nameRobertUppercase = DeferredCallChain::new_()
+            ->setName('Muda')
+            ->setFirstName('Robert')
+            ->throwExceptionForTestPurpose()
+            ->setAge(87)
+            ;
+            
+        try {
+            $robert = new Human;
+            $nameRobertUppercase($robert);
+            $this->assertTrue(false, "An exception must have been thrown here");
+        }
+        catch (\Exception $e) {
+            $this->assertEquals(
+                "An exception has been thrown by some user code"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($robert). ' ))'
+                 .'->setName(\'Muda\')->setFirstName(\'Robert\')->throwExceptionForTestPurpose()'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 14),
+                $e->getMessage()
+            );
+        }
+    }
+
     /**/
 }
 
@@ -527,7 +565,12 @@ class Human
         return $this->age;
     }
 
-    protected function throwExceptionForTestPurpose()
+    public function throwExceptionForTestPurpose()
+    {
+        throw new \Exception("An exception has been thrown by some user code");
+    }
+
+    protected function throwBadMethodCallExceptionDuringSetAge2()
     {
         throw new \BadMethodCallException("BadMethodCallException not thrown from __call");
     }
@@ -541,7 +584,7 @@ class Human
             throw new \Exception("Exception which is not a BadMethodCallException");
         }
         elseif ($name == 'setGender2') {
-            $this->throwExceptionForTestPurpose();
+            $this->throwBadMethodCallExceptionDuringSetAge2();
         }
         else {
             throw new \BadMethodCallException(

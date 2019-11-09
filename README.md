@@ -190,6 +190,19 @@ $robert = $nameRobert( new Human );
 
 ```
 
+### Calls provoking exceptions
+As a call can be made far before it's effectivelly applied, exceptions
+need more debug information for a smooth workflow. To achieve that, 
+a line is added to every exception message thrown during a DeferredCallChain 
+execution, pointing to the buggy call and where it is coded.
+
+For example, an exception having as message ```An exception has been thrown by some user code```
+will print
+```
+An exception has been thrown by some user code
+When applying (new JClaveau\Async\DeferredCallChain( <instance id> ))->previousSuccessfullCall()->buggyCall('Robert') called in <file>:<line>
+```
+
 
 ## More
 + [API Reference](docs)
