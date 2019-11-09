@@ -35,6 +35,38 @@ class DeferredCallChainTest extends \AbstractTest
 
     /**
      */
+    public function test_toString_too_long()
+    {
+        $target = new Human;
+        
+        $nameRobert = (new DeferredCallChain)
+            ->setName('A_name_longer_than_25_chars')
+            ->setFirstName($target)
+            ;
+
+        $this->assertEquals(
+            "(new JClaveau\Async\DeferredCallChain)->setName(A_name_lon ... n_25_chars)->setFirstName(JClaveau\Async\Human #".spl_object_id($target).")",
+            $nameRobert->toString([
+                'max_parameter_length' => 25,
+                'short_objects' => false,
+            ])
+        );
+        
+        $this->assertEquals(
+            "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(JClaveau\Async\Human::__set_state(array(
+   'name' => NULL,
+   'firstName' => NULL,
+   'age' => NULL,
+)))",
+            $nameRobert->toString([
+                'max_parameter_length' => 512,
+                'short_objects' => false,
+            ])
+        );
+    }
+
+    /**
+     */
     public function test_toString_with_string_target()
     {
         $nameRobert = DeferredCallChain::new_(Human::class)

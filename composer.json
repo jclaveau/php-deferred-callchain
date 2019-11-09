@@ -3,7 +3,7 @@
     "description": "Register a chain of calls that will be applied on an instance later",
     "license": "MIT",
     "type": "library",
-    "keywords": ["asynchronous", "fluent", "chain", "calls", "future", "promise", "php", "php5", "php7"],
+    "keywords": ["asynchronous", "fluent", "chain", "calls", "future", "promise", "lazy", "later", "php", "php5", "php7"],
     "authors": [
         {
             "name": "Jean Claveau",

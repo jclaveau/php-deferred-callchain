@@ -40,25 +40,36 @@ trait ExportTrait
      *
      * @return string The PHP code corresponding to this call chain
      */
-    protected function toString(array $options=[])
+    public function toString(array $options=[])
     {
         $target = isset($options['target']) ? $options['target'] : $this->expectedTarget;
+        $max_param_length = isset($options['max_parameter_length']) ? $options['max_parameter_length'] : 56;
+        $short_objects = isset($options['short_objects']) ? $options['short_objects'] : true;
         
         $string = '(new ' . get_called_class();
-        $target && $string .= '(' . static::varExport($target, ['short_objects']) . ')';
+        $target && $string .= '(' . static::varExport($target, [
+            'short_objects' => $short_objects, 
+            'max_length' => $max_param_length,
+        ]) . ')';
         $string .= ')';
 
         foreach ($this->stack as $i => $call) {
             if (isset($call['method'])) {
                 $string .= '->';
                 $string .= $call['method'].'(';
-                $string .= implode(', ', array_map(function($argument) {
-                    return static::varExport($argument, ['short_objects']);
+                $string .= implode(', ', array_map(function($argument) use ($max_param_length, $short_objects) {
+                    return static::varExport($argument, [
+                        'short_objects' => $short_objects, 
+                        'max_length' => $max_param_length
+                    ]);
                 }, $call['arguments']));
                 $string .= ')';
             }
             else {
-                $string .= '[' . static::varExport($call['entry'], ['short_objects']) . ']';
+                $string .= '[' . static::varExport($call['entry'], [
+                    'short_objects' => $short_objects, 
+                    'max_length' => $max_param_length,
+                ]) . ']';
             }
             
             if (! empty($options['limit']) && $options['limit'] == $i) {
@@ -78,8 +89,8 @@ trait ExportTrait
      */
     protected static function varExport($variable, array $options=[])
     {
-        $options['max_length']    = isset($options['max_length']) ? $options['max_length'] : 512;
-        $options['short_objects'] = ! empty($options['short_objects']) || in_array('short_objects', $options);
+        $options['max_length']    = isset($options['max_length']) ? $options['max_length'] : 56;
+        $options['short_objects'] = (! empty($options['short_objects'])) || in_array('short_objects', $options);
         
         $export = var_export($variable, true);
         
@@ -92,6 +103,7 @@ trait ExportTrait
         if (strlen($export) > $options['max_length']) {
             
             if (is_object($variable)) {
+                // shortening short objects would only slow the workflow
                 $export = get_class($variable) . ' #' . spl_object_id($variable);
             }
             elseif (is_string($variable)) {
