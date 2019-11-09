@@ -359,6 +359,94 @@ class DeferredCallChainTest extends \AbstractTest
     }
 
     /**
+     * @see https://github.com/jclaveau/php-deferred-callchain/issues/9
+     */
+    public function test_call_static_method()
+    {
+        $getMaxAge = (new DeferredCallChain)
+            ->getMaxAge(); // getMaxAge is static
+        
+        $mySubjectIMissedBefore = new Human;
+        $max_age = $getMaxAge( $mySubjectIMissedBefore );
+        
+        $this->assertEquals(125, $max_age);
+        
+        $max_age = $getMaxAge( Human::class );
+        $this->assertEquals(125, $max_age);
+    }
+
+    /**
+     */
+    public function test_call_from__callStatic_magic_method()
+    {
+        $defineMaxAge = (new DeferredCallChain)
+            ->setMaxAge(200)
+            ->getMaxAge()
+            ;
+
+        $max_age = $defineMaxAge( new Human );
+        
+        $this->assertEquals(200, $max_age);
+        
+        $defineMaxAge = (new DeferredCallChain)
+            ->setMaxAge(250)
+            ->getMaxAge()
+            ;
+
+        $max_age = $defineMaxAge( Human::class );
+        
+        $this->assertEquals(250, $max_age);
+    }
+
+    /**
+     */
+    public function test_exception_trown_from__callStatic_magic_method()
+    {
+        $defineMaxAge = (new DeferredCallChain)
+            ->setExistingColors('green', 'blue', 'orange')
+            ;
+
+        $somebody = new Human;        
+        try {
+            $max_age = $defineMaxAge( $somebody );
+            $this->assertTrue(false, 'An exception should have been thrown here');
+        }
+        catch (\Exception $e) {            
+            $this->assertEquals(
+                 "Exception which is not a BadMethodCallException"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
+                 .'->setExistingColors(\'green\', \'blue\', \'orange\')'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
+    public function test_usage_BadMethodCallException_trown_from__callStatic_magic_method()
+    {
+        $defineMaxAge = (new DeferredCallChain)
+            ->setPopulationCount(8000000000)
+            ;
+
+        $somebody = new Human;        
+        try {
+            $max_age = $defineMaxAge( $somebody );
+            $this->assertTrue(false, 'An exception should have been thrown here');
+        }
+        catch (\Exception $e) {            
+            $this->assertEquals(
+                 "BadMethodCallException not thrown from __callStatic"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
+                 .'->setPopulationCount(8000000000)'
+                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
      */
     public function test_exception_trown_under__call_magic_method()
     {
@@ -574,6 +662,12 @@ class Human
     protected $name;
     protected $firstName;
     protected $age;
+    protected static $maxAge=125;
+
+    public static function getMaxAge()
+    {
+        return self::$maxAge;
+    }
 
     public function setName($name)
     {
@@ -626,6 +720,31 @@ class Human
         
         return $this;
     }
+
+    public static function __callStatic($name, array $arguments)
+    {
+        if ($name == 'setMaxAge') {
+            self::$maxAge = $arguments[0];
+            return get_called_class();
+        }
+        elseif ($name == 'setExistingColors') {
+            throw new \Exception("Exception which is not a BadMethodCallException");
+        }
+        elseif ($name == 'setPopulationCount') {
+            self::throwBadMethodCallExceptionDuringsetPopulationCount();
+        }
+        else {
+            throw new \BadMethodCallException(
+                $name . ' is not a method of ' . Human::class
+            );
+        }
+    }
+
+    protected static function throwBadMethodCallExceptionDuringsetPopulationCount()
+    {
+        throw new \BadMethodCallException("BadMethodCallException not thrown from __callStatic");
+    }
+
 }
 
 class LaterHuman extends DeferredCallChain

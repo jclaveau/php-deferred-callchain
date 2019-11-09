@@ -10,10 +10,10 @@ It can now also handle function calls on non-objects and access array entries.
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-deferred-callchain/issues)
 
 ## Quality
---------------
 [![Build Status](https://travis-ci.org/jclaveau/php-deferred-callchain.png?branch=master)](https://travis-ci.org/jclaveau/php-deferred-callchain)
 [![codecov](https://codecov.io/gh/jclaveau/php-deferred-callchain/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-deferred-callchain)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/?branch=master)
+
 
 ## Installation
 php-deferred-callchain is installable via [Composer](http://getcomposer.org)
@@ -201,6 +201,16 @@ will print
 ```
 An exception has been thrown by some user code
 When applying (new JClaveau\Async\DeferredCallChain( <instance id> ))->previousSuccessfullCall()->buggyCall('Robert') called in <file>:<line>
+```
+
+### Static calls
+Static calls can be useful, especially for singletons. For some technical reasons explained here (https://github.com/jclaveau/php-deferred-callchain/issues/9),
+the only way to support it is to call them as normal methods (e.g. with -> )
+and look for it as a static method once we know it doesn't exist as as regular one.
+```php
+later(MyModel)->getInstance()->myNormalGetter();
+// or
+later(MyModel::class)->getInstance()->myNormalGetter();
 ```
 
 

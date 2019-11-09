@@ -139,14 +139,29 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      * @return bool $is_called
      */
     protected function checkMethodIsReallyCallable(
+        $method_type,
         &$current_chained_subject, 
         $method_name,
         $arguments
     ) {
         $is_called = true;
         try {
+            if ($method_type == '->') {
+                $callable = [$current_chained_subject, $method_name];
+            }
+            elseif ($method_type == '::') {
+                if (is_object($current_chained_subject)) {
+                    $class = get_class($current_chained_subject);
+                }
+                elseif (is_string($current_chained_subject)) {
+                    $class = $current_chained_subject;
+                }
+                
+                $callable = $class .'::'. $method_name;
+            }
+            
             $current_chained_subject = call_user_func_array(
-                [$current_chained_subject, $method_name], 
+                $callable, 
                 $arguments
             );
         }
@@ -186,7 +201,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
         $call_user_func_array_position = PHP_VERSION_ID < 70000 ? 2 : 1;
         
         return  
-                $trace[0]['function'] == '__call'
+                ($trace[0]['function'] == '__call' || $trace[0]['function'] == '__callStatic')
             &&  $trace[0]['class']    == get_class($current_chained_subject)
             &&  $trace[0]['args'][0]  == $method_name
             && (
@@ -212,6 +227,20 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
                 if (isset($call['method'])) {
                     if (is_callable([$out, $call['method']])) {
                         $is_called = $this->checkMethodIsReallyCallable(
+                            '->',
+                            $out,
+                            $call['method'],
+                            $call['arguments']
+                        );
+                    }
+                    
+                    if (! $is_called && (
+                                (is_string($out) && is_callable($out .'::'.$call['method']))
+                            ||  (is_object($out) && is_callable(get_class($out) .'::'.$call['method']))
+                        )
+                    ) {
+                        $is_called = $this->checkMethodIsReallyCallable(
+                            '::',
                             $out,
                             $call['method'],
                             $call['arguments']
