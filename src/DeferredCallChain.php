@@ -132,6 +132,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
      * Calling a method coded inside a magic __call can produce a 
      * BadMethodCallException and thus not be a callable.
      * 
+     * @param string $method_type '->' or '::'
      * @param mixed  $current_chained_subject
      * @param string $method_name
      * @param array  $arguments

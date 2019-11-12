@@ -38,6 +38,7 @@ trait ExportTrait
      * Outputs the PHP code producing the current call chain while it's casted
      * as a string.
      *
+     * @param  array  $options target: mixed | max_parameter_length: int | short_objects: bool
      * @return string The PHP code corresponding to this call chain
      */
     public function toString(array $options=[])
@@ -84,7 +85,7 @@ trait ExportTrait
      * Enhanced var_export() required for dumps.
      * 
      * @param  mixed  $variable
-     * @param  array  $options max_length | alias_instances
+     * @param  array  $options max_length: int | short_objects: bool
      * @return string The PHP code of the variable
      */
     protected static function varExport($variable, array $options=[])

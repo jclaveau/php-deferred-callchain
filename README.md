@@ -215,5 +215,5 @@ later(MyModel::class)->getInstance()->myNormalGetter();
 
 
 ## More
-+ [API Reference](docs)
++ [API Reference](api_reference)
 + [Tests](tests/unit/DeferredCallChainTest.php)

@@ -11,6 +11,6 @@ fi
 # phpdoc command
 ./tools/phpdoc-markdown-public/vendor/bin/phpdoc \
     --directory=src/ \
-    --target=docs \
+    --target=api_reference \
     --template="tools/phpdoc-markdown-public/data/templates/markdown-public" \
     --title="PHP Deferred Callchain"
