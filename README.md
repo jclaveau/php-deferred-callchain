@@ -257,11 +257,11 @@ For example, an exception having as message ```An exception has been thrown by s
 will print
 ```
 An exception has been thrown by some user code
-When applying (new JClaveau\Async\DeferredCallChain( <instance id> ))->previousSuccessfullCall()->buggyCall('Robert') called in <file>:<line>
+When applying (new JClaveau\Async\DeferredCallChain( <instance id> ))->previousSuccessfullCall()->buggyCall('Robert') defined at <file>:<line>
 ```
 
 ### Static calls
-Static calls can be useful, especially for singletons. For some technical reasons explained here (https://github.com/jclaveau/php-deferred-callchain/issues/9),
+Static calls can be useful, especially for singletons. For some technical reasons explained [here](https://github.com/jclaveau/php-deferred-callchain/issues/9),
 the only way to support it is to call them as normal methods (e.g. with -> )
 and look for it as a static method once we know it doesn't exist as a regular one.
 ```php

@@ -276,7 +276,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
                     $e,
                     'message',
                     $e->getMessage()
-                    . "\nWhen applying $callchain_description called in "
+                    . "\nWhen applying $callchain_description defined at "
                     . $call['file'] . ':' . $call['line']
                 );
                 

@@ -314,7 +314,7 @@ class DeferredCallChainTest extends \AbstractTest
             $this->assertEquals(
                  "setColor() is neither a method of JClaveau\Async\Human nor a function"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($mySubjectIMissedBefore). ' ))->setColor(\'green\')'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -352,7 +352,7 @@ class DeferredCallChainTest extends \AbstractTest
                  "Exception which is not a BadMethodCallException"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
                  .'->setGender(\'female\')'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -416,7 +416,7 @@ class DeferredCallChainTest extends \AbstractTest
                  "Exception which is not a BadMethodCallException"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
                  .'->setExistingColors(\'green\', \'blue\', \'orange\')'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -440,7 +440,7 @@ class DeferredCallChainTest extends \AbstractTest
                  "BadMethodCallException not thrown from __callStatic"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
                  .'->setPopulationCount(8000000000)'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -464,7 +464,7 @@ class DeferredCallChainTest extends \AbstractTest
                  "BadMethodCallException not thrown from __call"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
                  .'->setGender2(\'female\')'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 13),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
             );
         }
@@ -507,7 +507,7 @@ class DeferredCallChainTest extends \AbstractTest
                  "Undefined index: non_existing_entry"
                  ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export($robert, true). '))'
                  .'[\'non_existing_entry\']'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 14),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 14),
                 $e->getMessage()
             );
         }
@@ -648,7 +648,7 @@ class DeferredCallChainTest extends \AbstractTest
                 "An exception has been thrown by some user code"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($robert). ' ))'
                  .'->setName(\'Muda\')->setFirstName(\'Robert\')->throwExceptionForTestPurpose()'
-                 . " called in " . __FILE__ . ":" . (__LINE__ - 14),
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 14),
                 $e->getMessage()
             );
         }
