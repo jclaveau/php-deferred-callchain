@@ -1,8 +1,7 @@
 # PHP Deferred Callchain
-This class simply provides a way to define fluent chain of method calls before having
-the instance you wan't to applty it to.
-Once the expected instance is available, simply call the chain on it.
-It can now also handle function calls on non-objects and access array entries.
+This class simply provides a way to define fluent chain of methods, functions, 
+array access calls before having the target (object or native value) you wan't to apply it to.
+Once the expected targets are available, simply call the chain on them as if it was a function.
 
 [![Latest Stable Version](https://poser.pugx.org/jclaveau/php-deferred-callchain/v/stable)](https://packagist.org/packages/jclaveau/php-deferred-callchain)
 [![License](https://poser.pugx.org/jclaveau/php-deferred-callchain/license)](https://packagist.org/packages/jclaveau/php-deferred-callchain)
@@ -14,6 +13,47 @@ It can now also handle function calls on non-objects and access array entries.
 [![codecov](https://codecov.io/gh/jclaveau/php-deferred-callchain/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-deferred-callchain)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jclaveau/php-deferred-callchain/?branch=master)
 
+## Overview 
+```php
+// having
+class MyClass
+{
+    protected $name = 'unnamed';
+    
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+    
+    public function nameEntries()
+    {
+        return [
+            'my_entry_1' => $this->name . " 1",
+            'my_entry_2' => $this->name . " 2",
+        ];
+    }
+}
+
+// We can define some chained calls (none is executed)
+$doDummyCallsLater = DeferredCallChain::new_( MyClass::class )  // Targets must be MyClass instances
+    ->nameEntries()['my_entry_2']                               // access array entry
+    ->strtoupper()                                              // apply strtoupper() to it
+    ;
+
+// do whatever we want
+// ...
+
+// Get your targets
+$myInstance1 = (new MyClass)->setName('foo');
+$myInstance2 = (new MyClass)->setName('bar');
+
+// Execute the callchain
+echo $doDummyCallsLater( $myInstance1 ); // => FOO 2
+echo $doDummyCallsLater( $myInstance2 ); // => BAR 2
+
+```
+
 
 ## Installation
 php-deferred-callchain is installable via [Composer](http://getcomposer.org)
@@ -21,7 +61,24 @@ php-deferred-callchain is installable via [Composer](http://getcomposer.org)
     composer require jclaveau/php-deferred-callchain
 
 
+## Testing
+Tests are located [here](tests/unit/DeferredCallChainTest.php) and runnable
+by calling
+
+    ./phpunit
+
+
 ## Usage
+
+  * [Fluent call chain](#fluent-call-chain)
+  * [Functionnal and chained construction](#functionnal-and-chained-construction)
+  * [Working with arrays](#working-with-arrays)
+  * [Working with native types and functions](#working-with-native-types-and-functions)
+  * [Specifying on which class, interface, type or instance, the chain is callable](#specifying-on-which-class-interface-type-or-instance-the-chain-is-callable)
+  * [Calls provoking exceptions](#calls-provoking-exceptions)
+  * [Static calls](#static-calls)
+  * [API Reference](api_reference)
+
 
 ### Fluent call chain
 ```php
@@ -130,12 +187,12 @@ $explodeMyClassSentence( new MyClass ); // returns ['such', 'a', 'funny', 'lib',
 ```
 
 
-### Allowing a specific class, interface, type or a predefined instance as target of the later call.
+### Specifying on which class, interface, type or instance, the chain is callable
 You can force the target of your call chain to:
 
 + be an instance of a specific class
 ```php
-$nameRobert = DeferredCallChain::new_("Alien")
+$nameRobert = DeferredCallChain::new_(Alien::class)
     ->setName('Muda')
     ->setFirstName('Robert')
     ;
@@ -206,14 +263,9 @@ When applying (new JClaveau\Async\DeferredCallChain( <instance id> ))->previousS
 ### Static calls
 Static calls can be useful, especially for singletons. For some technical reasons explained here (https://github.com/jclaveau/php-deferred-callchain/issues/9),
 the only way to support it is to call them as normal methods (e.g. with -> )
-and look for it as a static method once we know it doesn't exist as as regular one.
+and look for it as a static method once we know it doesn't exist as a regular one.
 ```php
 later(MyModel)->getInstance()->myNormalGetter();
 // or
 later(MyModel::class)->getInstance()->myNormalGetter();
 ```
-
-
-## More
-+ [API Reference](api_reference)
-+ [Tests](tests/unit/DeferredCallChainTest.php)
