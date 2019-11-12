@@ -70,14 +70,32 @@ by calling
 
 ## Usage
 
-  * [Fluent call chain](#fluent-call-chain)
   * [Functionnal and chained construction](#functionnal-and-chained-construction)
+  * [Fluent call chain](#fluent-call-chain)
   * [Working with arrays](#working-with-arrays)
   * [Working with native types and functions](#working-with-native-types-and-functions)
   * [Specifying on which class, interface, type or instance, the chain is callable](#specifying-on-which-class-interface-type-or-instance-the-chain-is-callable)
   * [Calls provoking exceptions](#calls-provoking-exceptions)
   * [Static calls](#static-calls)
   * [API Reference](api_reference)
+
+
+### Functionnal and chained construction
+
+DeferredCallChain can be instanciated classically
+```php
+$nameRobert = (new DeferredCallChain(Human::class))->...
+```
+
+Statically
+```php
+$nameRobert = DeferredCallChain::new_(Human::class)->...
+```
+
+Or functionnaly
+```php
+$nameRobert = later(Human::class)->...
+```
 
 
 ### Fluent call chain
@@ -95,30 +113,9 @@ echo (string) $nameRobert;   // => "(new JClaveau\Async\DeferredCallChain)->setN
 ```
 
 
-### Functionnal and chained construction
-
-DeferredCallChain can be instanciated classically
-```php
-$nameRobert = (new DeferredCallChain(Human::class))
-    ->setName('Muda')->setFirstName('Robert');
-```
-
-Statically
-```php
-$nameRobert = DeferredCallChain::new_(Human::class)
-    ->setName('Muda')->setFirstName('Robert');
-```
-
-Or functionnaly
-```php
-$nameRobert = later(Human::class)
-    ->setName('Muda')->setFirstName('Robert');
-```
-
-
 ### Working with arrays
 ```php
-$getSubColumnValue = (new DeferredCallChain)
+$getSubColumnValue = DeferredCallChain::new_()
     ['column_1']
     ['sub_column_3']
     ;
@@ -207,7 +204,7 @@ $robert = $nameRobert( $mySubjectIMissedBefore );
 + implement a specific interface
 
 ```php
-$getCount = (new DeferredCallChain("\Traversable"))
+$getCount = DeferredCallChain::new_("\Traversable")
     ->count()
     ;
 
@@ -265,7 +262,7 @@ Static calls can be useful, especially for singletons. For some technical reason
 the only way to support it is to call them as normal methods (e.g. with -> )
 and look for it as a static method once we know it doesn't exist as a regular one.
 ```php
-later(MyModel)->getInstance()->myNormalGetter();
-// or
 later(MyModel::class)->getInstance()->myNormalGetter();
+// or
+later($myModel)->getInstance()->myNormalGetter(); // like $myModel::getInstance()
 ```
