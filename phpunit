@@ -25,4 +25,20 @@ if (PHP_VERSION_ID >= 70000) {
 $args = $argv;
 array_shift($args);
 
-system('./vendor/bin/phpunit ' . implode(' ', $args) . ' --colors=always');
+// var_dump($args);
+// exit;
+
+
+if (PHP_VERSION_ID >= 70000) {
+    $config = 'tests/phpunit.xml';    
+    // $clover = '--coverage-clover coverage-clover.xml';
+}
+else {
+    $config = 'tests/phpunit_5.6.xml';
+}
+
+system(
+    './vendor/bin/phpunit --config ' . $config
+    . ' ' . implode(' ', $args) . ' ' 
+    . ' --colors=always'
+);

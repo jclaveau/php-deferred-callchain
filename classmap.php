@@ -3,7 +3,11 @@
  */ 
 function scandir_r($directory) {
     // $files = array_slice(scandir($directory, SCANDIR_SORT_NONE), 2);
-    $files = array_slice(scandir($directory), 2);
+    if (! $entries = scandir($directory)) {
+        throw new \InvalidArgumentException("Error during scandir");
+    }
+    
+    $files = array_slice($entries, 2);
 
     $map = [];
     foreach ($files as $file) {

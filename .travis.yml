@@ -20,17 +20,10 @@ before_script:
 # Commands you want to run that will verify your build.
 # Do not use the customized ./phpunit as retrocompatibility must be
 # generated and committed 
-script: ./vendor/bin/phpunit --coverage-clover=coverage.xml --testsuite=all_tests
+script: ./phpunit --testsuite=all_tests
 
 after_script:
  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
 after_success:
  - bash <(curl -s https://codecov.io/bash)
-
-# Handle git submodules yourself. https://stackoverflow.com/questions/15674064/how-to-fix-a-permission-denied-publickey-error-for-a-git-submodule-update-in-t
-git:
-    submodules: false
-# Use sed to replace the SSH URL with the public URL, then initialize submodules
-before_install:
-    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules

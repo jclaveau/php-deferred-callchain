@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit backupGlobals="false"
+         defaultTestSuite="all_tests"
+         backupStaticAttributes="false"
+         colors="true"
+         bootstrap="./bootstrap_phpunit.php"
+         >
+
+    <testsuites>
+        <!-- TODO defaultTestSuite will work with phpunit 6.1 -->
+        <testsuite name="all_tests">
+            <directory>./unit</directory>
+            <!-- /!\ keep the public API after unit tests to ease debug -->
+            <directory>./functionnal</directory>
+        </testsuite>
+        <testsuite name="profiling">
+            <directory>./profiling</directory>
+        </testsuite>
+    </testsuites>
+
+
+    <filter>
+        <!-- /!\ whitelist will exclude every outside class from coverage -->
+        <whitelist>
+            <directory suffix=".php">../src_5.6</directory>
+<!--
+            <directory suffix=".php">./tests</directory>
+-->
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-clover" target="../clover.xml"/>
+        <log type="coverage-html" target="coverage_5.6/"/>
+    </logging>
+</phpunit>
