@@ -9,7 +9,12 @@ ini_set('xdebug.var_display_max_depth', -1);
 ini_set('xdebug.var_display_max_children', -1);
 ini_set('xdebug.var_display_max_data', -1);
 
-require_once __DIR__ . '/AbstractTest.php';
+if (class_exists('\PHPUnit_Framework_TestCase') ) {
+    require_once __DIR__ . '/AbstractTest_5.6.php';
+}
+else {
+    require_once __DIR__ . '/AbstractTest.php';
+}
 
 if (extension_loaded('xhprof')) {
     // ini_set('xhprof.output_dir', __DIR__ . '/profile');

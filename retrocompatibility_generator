@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Install if missing
+if [ -z "$(ls -A tools/7to5)" ]; then
+    git submodule update --init --recursive
+    cd tools/7to5
+    composer install
+    cd ../..
+fi
+
+# doesn't work with 5.6
+php7.3 ./tools/7to5/php7to5 convert src/ src_5.6 --overwrite

@@ -1,3 +1,6 @@
 [submodule "tools/phpdoc-markdown-public"]
 	path = tools/phpdoc-markdown-public
 	url = https://github.com/cvuorinen/phpdoc-markdown-public/
+[submodule "tools/7to5"]
+	path = tools/7to5
+	url = git@github.com:danog/7to5.git

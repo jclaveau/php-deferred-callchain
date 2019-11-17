@@ -1,1 +1,28 @@
-vendor/bin/phpunit
+#!/usr/bin/env php
+<?php
+// Checks that the platform fit its requirements and do a composer update
+// if failing. 
+// For example when you run your tests with different PHP versions.
+exec('composer check-platform-reqs', $output);
+
+$failed = false;
+foreach ($output as $line) {
+    if (preg_match("/failed$/", $line)) {
+        $failed = true;
+        break;
+    }
+}
+
+if ($failed) {
+    exec('composer update', $output2);
+}
+
+if (PHP_VERSION_ID >= 70000) {
+    // generate PHP 5.6 classes
+    system(__DIR__ . '/retrocompatibility_generator');
+}
+
+$args = $argv;
+array_shift($args);
+
+system('./vendor/bin/phpunit ' . implode(' ', $args) . ' --colors=always');
