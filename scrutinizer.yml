@@ -1,0 +1,13 @@
+before_commands:
+  - "sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules"
+
+build:
+  nodes:
+    coverage:
+      tests:
+        override:
+#          - command: ./phpunit --no-coverage
+          - command: ./vendor/bin/phpunit --coverage-clover clover.xml
+            coverage:
+              file: clover.xml
+              format: clover
