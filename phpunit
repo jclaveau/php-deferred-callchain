@@ -1,44 +1,41 @@
 #!/usr/bin/env php
 <?php
-// Checks that the platform fit its requirements and do a composer update
-// if failing. 
-// For example when you run your tests with different PHP versions.
-exec('composer check-platform-reqs', $output);
 
-$failed = false;
-foreach ($output as $line) {
-    if (preg_match("/failed$/", $line)) {
-        $failed = true;
-        break;
-    }
-}
-
-if ($failed) {
-    exec('composer update', $output2);
-}
-
-if (PHP_VERSION_ID >= 70000) {
+if (PHP_VERSION_ID < 70000) {
     // generate PHP 5.6 classes
     system(__DIR__ . '/retrocompatibility_generator');
 }
 
+if (preg_match("/^(.+\/)?php\d+.\d+$/", $_SERVER['_'])) {
+    $php_bin = $_SERVER['_'];
+}
+else {
+    $php_bin = '';
+}
+
+// remove the ./phpunit
 $args = $argv;
 array_shift($args);
 
-// var_dump($args);
-// exit;
-
-
 if (PHP_VERSION_ID >= 70000) {
     $config = 'tests/phpunit.xml';    
-    // $clover = '--coverage-clover coverage-clover.xml';
 }
 else {
     $config = 'tests/phpunit_5.6.xml';
 }
 
+$version = explode('.',phpversion());
+$version = $version[0] . '.' . $version[1];
+
+$phpunit_path = './vendor_'.$version.'/bin/phpunit';
+
+if ( ! is_file($phpunit_path)) {
+    system($php_bin.' ./composer install');
+}
+
+// var_dump($phpunit_path);
 system(
-    './vendor/bin/phpunit --config ' . $config
+    $php_bin.' '.$phpunit_path.' --config ' . $config
     . ' ' . implode(' ', $args) . ' ' 
     . ' --colors=always'
 );

@@ -1,8 +1,11 @@
 /vendor
+/vendor_*/
 /.idea
 /tests/coverage*
 /clover.xml
 /api_reference/phpdoc-*
 .directory
-composer.lock
+/composer.lock
+/composer_*.lock
+/composer_*.json
 .phpunit.result.cache

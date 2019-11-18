@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php
+if (preg_match("/^(.+\/)?php\d+.\d+$/", $_SERVER['_'])) {
+    $php_bin = $_SERVER['_'];
+}
+else {
+    $php_bin = '';
+}
+
+// remove the ./phpunit
+$args = $argv;
+array_shift($args);
+ 
+$version = explode('.',phpversion());
+$version = $version[0] . '.' . $version[1];
+
+// var_dump($version);
+
+// copy composer .json
+copy('composer.json', 'composer_'.$version.'.json');
+putenv("COMPOSER=composer_$version.json");
+
+
+// call composer specifying the vendor_dir
+putenv("COMPOSER_VENDOR_DIR=vendor_$version");
+
+$args = $argv;
+array_shift($args);
+
+system(
+    $php_bin.' /usr/bin/composer'
+    . ' ' . implode(' ', $args) . ' ' 
+);
+
+unlink("composer_$version.json");
