@@ -13,7 +13,7 @@
     "minimum-stability": "stable",
     "autoload": {
         "files": [
-            "classmap.php"
+            "autoloader.php"
         ]
     },
     "require-dev": {
