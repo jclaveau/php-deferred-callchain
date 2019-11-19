@@ -151,7 +151,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
     {
         // Before PHP 7, there is a raw for the non existing method called
         $call_user_func_array_position = PHP_VERSION_ID < 70000 ? 2 : 1;
-        return ($trace[0]['function'] == '__call' || $trace[0]['function'] == '__callStatic') && $trace[0]['class'] == get_class($current_chained_subject) && $trace[0]['args'][0] == $method_name && ($trace[$call_user_func_array_position]['file'] == __FILE__ && $trace[$call_user_func_array_position]['function'] == 'call_user_func_array');
+        return ($trace[0]['function'] == '__call' || $trace[0]['function'] == '__callStatic') && $trace[0]['class'] == (is_string($current_chained_subject) ? $current_chained_subject : get_class($current_chained_subject)) && $trace[0]['args'][0] == $method_name && ($trace[$call_user_func_array_position]['file'] == __FILE__ && $trace[$call_user_func_array_position]['function'] == 'call_user_func_array');
     }
     /**
      * Invoking the instance produces the call of the stack
@@ -178,7 +178,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
                         $is_called = true;
                     }
                     if (!$is_called) {
-                        throw new \BadMethodCallException($call['method'] . "() is neither a method of " . get_class($out) . " nor a function");
+                        throw new \BadMethodCallException($call['method'] . "() is neither a method of " . (is_string($out) ? $out : get_class($out)) . " nor a function");
                     }
                 } else {
                     $out = $out[$call['entry']];

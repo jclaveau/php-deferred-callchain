@@ -424,7 +424,7 @@ class DeferredCallChainTest extends \AbstractTest
 
     /**
      */
-    public function test_usage_BadMethodCallException_trown_from__callStatic_magic_method()
+    public function test_usage_BadMethodCallException_trown_from__callStatic_magic_method_on_instance()
     {
         $defineMaxAge = (new DeferredCallChain)
             ->setPopulationCount(8000000000)
@@ -435,12 +435,35 @@ class DeferredCallChainTest extends \AbstractTest
             $max_age = $defineMaxAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\Exception $e) {            
+        catch (\Exception $e) {
             $this->assertEquals(
                  "BadMethodCallException not thrown from __callStatic"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
                  .'->setPopulationCount(8000000000)'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     */
+    public function test_call_missing_static_method_on_classname()
+    {
+        $defineMaxAge = (new DeferredCallChain)
+            ->nonExistingStaticMethod()
+            ;
+
+        try {
+            $max_age = $defineMaxAge( Human::class );
+            $this->assertTrue(false, 'An exception should have been thrown here');
+        }
+        catch (\Exception $e) {            
+            $this->assertEquals(
+                 "nonExistingStaticMethod() is neither a method of JClaveau\Async\Human nor a function"
+                 ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export(Human::class, true) . '))'
+                 .'->nonExistingStaticMethod()'
+                 . " defined at " . __FILE__ . ":" . (__LINE__ - 12),
                 $e->getMessage()
             );
         }
