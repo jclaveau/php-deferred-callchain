@@ -9,7 +9,6 @@
     <testsuites>
         <testsuite name="all_tests">
             <directory>./unit</directory>
-            <directory>./functionnal</directory>
         </testsuite>
         <testsuite name="profiling">
             <directory>./profiling</directory>
@@ -20,9 +19,8 @@
         <include>
             <directory suffix=".php">../src</directory>
         </include>
+        <report>
+            <clover outputFile="../clover.xml"/>
+        </report>
     </coverage>
-
-    <logging>
-        <log type="coverage-clover" target="../clover.xml"/>
-    </logging>
 </phpunit>

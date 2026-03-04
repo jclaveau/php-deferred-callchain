@@ -167,7 +167,23 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
             );
         }
         catch (\BadMethodCallException $e) {
-            if ($this->exceptionTrownFromMagicCall(
+            if ($method_type == '->' && is_object($current_chained_subject)) {
+                $class = get_class($current_chained_subject);
+                if (preg_match('/^' . preg_quote($method_name, '/') . ' is not a method of /', $e->getMessage())) {
+                    $is_called = false;
+                }
+                elseif ($this->exceptionTrownFromMagicCall(
+                    $e->getTrace(),
+                    $current_chained_subject,
+                    $method_name
+                )) {
+                    $is_called = false;
+                }
+                else {
+                    throw $e;
+                }
+            }
+            elseif ($this->exceptionTrownFromMagicCall(
                 $e->getTrace(),
                 $current_chained_subject,
                 $method_name
@@ -206,6 +222,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
             &&  $trace[0]['class']    == (is_string($current_chained_subject) 
                                        ? $current_chained_subject 
                                        : get_class($current_chained_subject))
+            &&  isset($trace[0]['args'][0])
             &&  $trace[0]['args'][0]  == $method_name
             && (
                     $trace[$call_user_func_array_position]['file'] == __FILE__
@@ -228,37 +245,46 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
             $is_called = false;
             try {
                 if (isset($call['method'])) {
-                    if (is_callable([$out, $call['method']])) {
-                        $is_called = $this->checkMethodIsReallyCallable(
-                            '->',
-                            $out,
-                            $call['method'],
-                            $call['arguments']
-                        );
-                    }
+                    $method = $call['method'];
+                    $arguments = $call['arguments'];
                     
-                    if (! $is_called && (
-                                (is_string($out) && is_callable($out .'::'.$call['method']))
-                            ||  (is_object($out) && is_callable(get_class($out) .'::'.$call['method']))
-                        )
-                    ) {
+                    if (is_object($out)) {
+                        if (is_callable([$out, $method])) {
+                            $is_called = $this->checkMethodIsReallyCallable(
+                                '->',
+                                $out,
+                                $method,
+                                $arguments
+                            );
+                        }
+                        
+                        if (! $is_called && is_callable(get_class($out) . '::' . $method)) {
+                            $is_called = $this->checkMethodIsReallyCallable(
+                                '::',
+                                $out,
+                                $method,
+                                $arguments
+                            );
+                        }
+                    }
+                    elseif (is_string($out) && is_callable($out . '::' . $method)) {
                         $is_called = $this->checkMethodIsReallyCallable(
                             '::',
                             $out,
-                            $call['method'],
-                            $call['arguments']
+                            $method,
+                            $arguments
                         );
                     }
                     
-                    if (! $is_called && is_callable($call['method'])) {
-                        $arguments = $this->prepareArgs($call['arguments'], $out);
-                        $out = call_user_func_array($call['method'], $arguments);
+                    if (! $is_called && is_callable($method)) {
+                        $arguments = $this->prepareArgs($arguments, $out);
+                        $out = call_user_func_array($method, $arguments);
                         $is_called = true;
                     }
                     
                     if (! $is_called) {
                         throw new \BadMethodCallException(
-                            $call['method'] . "() is neither a method of "
+                            $method . "() is neither a method of "
                             . (is_string($out) ? $out : get_class($out))
                             . " nor a function"
                         );

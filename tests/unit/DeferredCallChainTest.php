@@ -53,7 +53,7 @@ class DeferredCallChainTest extends \AbstractTest
         );
         
         $this->assertEquals(
-            "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(JClaveau\Async\Human::__set_state(array(
+            "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(\\JClaveau\Async\Human::__set_state(array(
    'name' => NULL,
    'firstName' => NULL,
    'age' => NULL,
@@ -312,7 +312,7 @@ class DeferredCallChainTest extends \AbstractTest
         }
         catch (\BadMethodCallException $e) {            
             $this->assertEquals(
-                 "setColor() is neither a method of JClaveau\Async\Human nor a function"
+                 "setColor is not a method of " . Human::class
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($mySubjectIMissedBefore). ' ))->setColor(\'green\')'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
@@ -460,7 +460,7 @@ class DeferredCallChainTest extends \AbstractTest
         }
         catch (\Exception $e) {            
             $this->assertEquals(
-                 "nonExistingStaticMethod() is neither a method of JClaveau\Async\Human nor a function"
+                 "nonExistingStaticMethod is not a method of " . Human::class
                  ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export(Human::class, true) . '))'
                  .'->nonExistingStaticMethod()'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 12),
@@ -527,7 +527,7 @@ class DeferredCallChainTest extends \AbstractTest
         }
         catch (\Exception $e) {
             $this->assertEquals(
-                 "Undefined index: non_existing_entry"
+                 "Undefined array key \"non_existing_entry\""
                  ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export($robert, true). '))'
                  .'[\'non_existing_entry\']'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 14),
