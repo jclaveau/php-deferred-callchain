@@ -38,7 +38,7 @@ class DeferredCallChainTest extends \AbstractTest
     public function test_toString_too_long()
     {
         $target = new Human;
-        
+
         $nameRobert = (new DeferredCallChain)
             ->setName('A_name_longer_than_25_chars')
             ->setFirstName($target)
@@ -51,17 +51,24 @@ class DeferredCallChainTest extends \AbstractTest
                 'short_objects' => false,
             ])
         );
-        
-        $this->assertEquals(
-            "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(JClaveau\Async\Human::__set_state(array(
+
+        $actual = $nameRobert->toString([
+            'max_parameter_length' => 512,
+            'short_objects' => false,
+        ]);
+
+        $this->assertTrue(
+            $actual === "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(\\JClaveau\Async\Human::__set_state(array(
+   'name' => NULL,
+   'firstName' => NULL,
+   'age' => NULL,
+)))"
+            || $actual === "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(JClaveau\Async\Human::__set_state(array(
    'name' => NULL,
    'firstName' => NULL,
    'age' => NULL,
 )))",
-            $nameRobert->toString([
-                'max_parameter_length' => 512,
-                'short_objects' => false,
-            ])
+            "Expected either PHP 8.2+ format or PHP 8.0/8.1 format, got: $actual"
         );
     }
 
@@ -78,7 +85,7 @@ class DeferredCallChainTest extends \AbstractTest
             "(new JClaveau\Async\DeferredCallChain(".var_export(Human::class, true)."))->setName('Muda')->setFirstName('Robert')",
             (string) $nameRobert
         );
-        
+
         // Check that the toString result is valid PHP code
         eval('$nameRobert2 = ' . $nameRobert . ';');
         $this->assertEquals(
@@ -92,7 +99,7 @@ class DeferredCallChainTest extends \AbstractTest
     public function test_toString_with_instance_target()
     {
         $human = new Human;
-        
+
         $nameRobert = DeferredCallChain::new_($human)
             ->setName('Muda')
             ->setFirstName('Robert')
@@ -128,7 +135,7 @@ class DeferredCallChainTest extends \AbstractTest
     public function test_invoke_with_predefined_target()
     {
         $mySubject = new Human;
-        
+
         $nameRobert = (new DeferredCallChain($mySubject))
             ->setName('Muda')
             ->setFirstName('Robert')
@@ -148,7 +155,7 @@ class DeferredCallChainTest extends \AbstractTest
     public function test_invoke_with_predefined_target_and_a_new_target()
     {
         $mySubject = new Human;
-        
+
         $nameRobert = (new DeferredCallChain($mySubject))
             ->setName('Muda')
             ->setFirstName('Robert')
@@ -310,9 +317,9 @@ class DeferredCallChainTest extends \AbstractTest
             $fullName = $defineAge( $mySubjectIMissedBefore );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\BadMethodCallException $e) {            
+        catch (\BadMethodCallException $e) {
             $this->assertEquals(
-                 "setColor() is neither a method of JClaveau\Async\Human nor a function"
+                 "setColor() is neither a method of " . Human::class . " nor a function"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($mySubjectIMissedBefore). ' ))->setColor(\'green\')'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 13),
                 $e->getMessage()
@@ -330,7 +337,7 @@ class DeferredCallChainTest extends \AbstractTest
 
         $mySubjectIMissedBefore = new Human;
         $fullName = $defineAge( $mySubjectIMissedBefore );
-        
+
         $this->assertEquals(23, $mySubjectIMissedBefore->getAge());
     }
 
@@ -347,7 +354,7 @@ class DeferredCallChainTest extends \AbstractTest
             $fullName = $defineAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\Exception $e) {            
+        catch (\Exception $e) {
             $this->assertEquals(
                  "Exception which is not a BadMethodCallException"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
@@ -365,12 +372,12 @@ class DeferredCallChainTest extends \AbstractTest
     {
         $getMaxAge = (new DeferredCallChain)
             ->getMaxAge(); // getMaxAge is static
-        
+
         $mySubjectIMissedBefore = new Human;
         $max_age = $getMaxAge( $mySubjectIMissedBefore );
-        
+
         $this->assertEquals(125, $max_age);
-        
+
         $max_age = $getMaxAge( Human::class );
         $this->assertEquals(125, $max_age);
     }
@@ -385,16 +392,16 @@ class DeferredCallChainTest extends \AbstractTest
             ;
 
         $max_age = $defineMaxAge( new Human );
-        
+
         $this->assertEquals(200, $max_age);
-        
+
         $defineMaxAge = (new DeferredCallChain)
             ->setMaxAge(250)
             ->getMaxAge()
             ;
 
         $max_age = $defineMaxAge( Human::class );
-        
+
         $this->assertEquals(250, $max_age);
     }
 
@@ -406,12 +413,12 @@ class DeferredCallChainTest extends \AbstractTest
             ->setExistingColors('green', 'blue', 'orange')
             ;
 
-        $somebody = new Human;        
+        $somebody = new Human;
         try {
             $max_age = $defineMaxAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\Exception $e) {            
+        catch (\Exception $e) {
             $this->assertEquals(
                  "Exception which is not a BadMethodCallException"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
@@ -430,7 +437,7 @@ class DeferredCallChainTest extends \AbstractTest
             ->setPopulationCount(8000000000)
             ;
 
-        $somebody = new Human;        
+        $somebody = new Human;
         try {
             $max_age = $defineMaxAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
@@ -458,9 +465,9 @@ class DeferredCallChainTest extends \AbstractTest
             $max_age = $defineMaxAge( Human::class );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\Exception $e) {            
+        catch (\Exception $e) {
             $this->assertEquals(
-                 "nonExistingStaticMethod() is neither a method of JClaveau\Async\Human nor a function"
+                 "nonExistingStaticMethod() is neither a method of " . Human::class . " nor a function"
                  ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export(Human::class, true) . '))'
                  .'->nonExistingStaticMethod()'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 12),
@@ -482,7 +489,7 @@ class DeferredCallChainTest extends \AbstractTest
             $fullName = $defineAge( $somebody );
             $this->assertTrue(false, 'An exception should have been thrown here');
         }
-        catch (\BadMethodCallException $e) {            
+        catch (\BadMethodCallException $e) {
             $this->assertEquals(
                  "BadMethodCallException not thrown from __call"
                  ."\nWhen applying (new " . DeferredCallChain::class . '( ' . Human::class . ' #' . spl_object_id($somebody). ' ))'
@@ -527,7 +534,7 @@ class DeferredCallChainTest extends \AbstractTest
         }
         catch (\Exception $e) {
             $this->assertEquals(
-                 "Undefined index: non_existing_entry"
+                 "Undefined array key \"non_existing_entry\""
                  ."\nWhen applying (new " . DeferredCallChain::class . '(' . var_export($robert, true). '))'
                  .'[\'non_existing_entry\']'
                  . " defined at " . __FILE__ . ":" . (__LINE__ - 14),
@@ -632,7 +639,7 @@ class DeferredCallChainTest extends \AbstractTest
             ->getFullName()
             ->strtoupper()
             ;
-            
+
         $this->assertEquals('ROBERT MUDA', $nameRobertUppercase(new Human));
     }
 
@@ -646,7 +653,7 @@ class DeferredCallChainTest extends \AbstractTest
             ->getFullName()
             ->explode(' ', '$$')
             ;
-            
+
         $this->assertEquals(['Robert', 'Muda'], $nameRobertUppercase(new Human));
     }
 
@@ -660,7 +667,7 @@ class DeferredCallChainTest extends \AbstractTest
             ->throwExceptionForTestPurpose()
             ->setAge(87)
             ;
-            
+
         try {
             $robert = new Human;
             $nameRobertUppercase($robert);
@@ -740,7 +747,7 @@ class Human
                 $name . ' is not a method of ' . Human::class
             );
         }
-        
+
         return $this;
     }
 

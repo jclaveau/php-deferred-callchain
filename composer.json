@@ -3,7 +3,7 @@
     "description": "Register a chain of calls that will be applied on an instance later",
     "license": "MIT",
     "type": "library",
-    "keywords": ["asynchronous", "fluent", "chain", "calls", "future", "promise", "lazy", "later", "php", "php5", "php7"],
+    "keywords": ["asynchronous", "fluent", "chain", "calls", "future", "promise", "lazy", "later", "php", "php7", "php8"],
     "authors": [
         {
             "name": "Jean Claveau",
@@ -12,16 +12,18 @@
     ],
     "minimum-stability": "stable",
     "autoload": {
+        "psr-4": {
+            "JClaveau\\Async\\": "src/"
+        },
         "files": [
-            "autoloader.php"
+            "src/functions.php"
         ]
     },
     "require-dev": {
-        "phpunit/phpunit": ">=5"
+        "phpunit/phpunit": "^9.5"
     },
     "require": {
-        "php": "^7.1 || ^8.0",
-        "symfony/polyfill-php72": "^1.12",
+        "php": "^8.0",
         "jclaveau/php-fluent-trait": "^1.1",
         "jclaveau/php-visibility-violator": "^1.0 || ^2.0"
     }
