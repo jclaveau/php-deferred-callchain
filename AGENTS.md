@@ -1,7 +1,7 @@
 # AGENTS.md - Project-specific instructions
 
 ## Git Commit Prefixing
-- All commits must be prefixed with `(AI based: MiniMax M2.5)`
+- All commits must be prefixed with `(AI based: <model-name>)`
 
 ## GitHub Actions
 - Run on every push: `branches: ['**']`
