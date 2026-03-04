@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [master, develop]
+    branches: ['**']
   pull_request:
-    branches: [master]
+    branches: ['**']
 
 jobs:
   test:
@@ -34,4 +34,11 @@ jobs:
         run: composer install --no-interaction
 
       - name: Run tests
-        run: ./vendor/bin/phpunit --configuration tests/phpunit.xml --testsuite all_tests
+        run: ./vendor/bin/phpunit --configuration tests/phpunit.xml --testsuite all_tests --coverage-clover coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          flags: unittests
+          name: php-${{ matrix.php-version }}
