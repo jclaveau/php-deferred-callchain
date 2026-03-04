@@ -167,23 +167,7 @@ class DeferredCallChain implements \JsonSerializable, \ArrayAccess
             );
         }
         catch (\BadMethodCallException $e) {
-            if ($method_type == '->' && is_object($current_chained_subject)) {
-                $class = get_class($current_chained_subject);
-                if (preg_match('/^' . preg_quote($method_name, '/') . ' is not a method of /', $e->getMessage())) {
-                    $is_called = false;
-                }
-                elseif ($this->exceptionTrownFromMagicCall(
-                    $e->getTrace(),
-                    $current_chained_subject,
-                    $method_name
-                )) {
-                    $is_called = false;
-                }
-                else {
-                    throw $e;
-                }
-            }
-            elseif ($this->exceptionTrownFromMagicCall(
+            if ($this->exceptionTrownFromMagicCall(
                 $e->getTrace(),
                 $current_chained_subject,
                 $method_name
