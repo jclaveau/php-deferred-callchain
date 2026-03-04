@@ -10,7 +10,7 @@ else {
     $root = 'src_5.6';
 }
 
-$loader = require "./vendor_$version/autoload.php";
+$loader = require __DIR__ . '/../autoload.php';
 $loader->addPsr4('JClaveau\\Async\\', __DIR__.'/'.$root.'/');
 
 require_once(__DIR__.'/'.$root.'/functions.php');
