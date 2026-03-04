@@ -1,16 +1,6 @@
 <?php
 
-$version = explode('.',phpversion());
-$version = $version[0] . '.' . $version[1];
-
-if (PHP_VERSION_ID >= 70000) {
-    $root = 'src';
-}
-else {
-    $root = 'src_5.6';
-}
-
 $loader = require __DIR__ . '/../autoload.php';
-$loader->addPsr4('JClaveau\\Async\\', __DIR__.'/'.$root.'/');
+$loader->addPsr4('JClaveau\\Async\\', __DIR__.'/src/');
 
-require_once(__DIR__.'/'.$root.'/functions.php');
+require_once(__DIR__.'/src/functions.php');
