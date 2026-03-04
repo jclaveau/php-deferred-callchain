@@ -52,16 +52,23 @@ class DeferredCallChainTest extends \AbstractTest
             ])
         );
         
-        $this->assertEquals(
-            "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(\\JClaveau\Async\Human::__set_state(array(
+        $actual = $nameRobert->toString([
+            'max_parameter_length' => 512,
+            'short_objects' => false,
+        ]);
+        
+        $this->assertTrue(
+            $actual === "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(\\JClaveau\Async\Human::__set_state(array(
+   'name' => NULL,
+   'firstName' => NULL,
+   'age' => NULL,
+)))"
+            || $actual === "(new JClaveau\Async\DeferredCallChain)->setName('A_name_longer_than_25_chars')->setFirstName(JClaveau\Async\Human::__set_state(array(
    'name' => NULL,
    'firstName' => NULL,
    'age' => NULL,
 )))",
-            $nameRobert->toString([
-                'max_parameter_length' => 512,
-                'short_objects' => false,
-            ])
+            "Expected either PHP 8.2+ format or PHP 8.0/8.1 format, got: $actual"
         );
     }
 
